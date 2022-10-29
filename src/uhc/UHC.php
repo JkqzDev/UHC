@@ -6,6 +6,7 @@ namespace uhc;
 
 use pocketmine\plugin\PluginBase;
 use uhc\session\SessionFactory;
+use uhc\world\WorldFactory;
 
 final class UHC extends PluginBase {
 
@@ -22,6 +23,8 @@ final class UHC extends PluginBase {
 
     protected function onEnable(): void
     {
+        WorldFactory::loadAll();
+
         SessionFactory::task();
 
         $this->registerHandlers();
