@@ -23,7 +23,7 @@ final class SessionFactory {
     }
 
     static public function create(Player $player): void {
-        self::$sessions[$player->getXuid()] = new Session($player->getUniqueId()->getBytes(), $player->getName());
+        self::$sessions[$player->getXuid()] = new Session($player->getUniqueId()->getBytes(), $player->getXuid(), $player->getName());
     }
 
     static public function task(): void {

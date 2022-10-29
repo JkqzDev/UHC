@@ -14,9 +14,14 @@ final class Session {
 
     public function __construct(
         private string $uuid,
+        private string $xuid,
         private string $name,
     ) {
         $this->setScoreboard(new ScoreboardBuilder($this, '&l&bUHC&r'));
+    }
+
+    public function getXuid(): string {
+        return $this->xuid;
     }
 
     public function getName(): string {
