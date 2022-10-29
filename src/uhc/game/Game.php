@@ -6,11 +6,16 @@ namespace uhc\game;
 
 use pocketmine\world\World;
 use uhc\game\border\BorderHandler;
+use uhc\game\cache\InventoryCache;
+use uhc\game\cache\PositionCache;
 
 final class Game {
 
     private GameProperties $properties;
     private BorderHandler $border;
+
+    private InventoryCache $inventoryCache;
+    private PositionCache $positionCache;
 
     public function __construct(
         private int $status = GameStatus::WAITING,
@@ -23,6 +28,9 @@ final class Game {
     ) {
         $this->properties = new GameProperties;
         $this->border = new BorderHandler;
+
+        $this->inventoryCache = new InventoryCache;
+        $this->positionCache = new PositionCache;
     }
 
     public function getProperties(): GameProperties {
@@ -31,6 +39,14 @@ final class Game {
 
     public function getBorder(): BorderHandler {
         return $this->border;
+    }
+
+    public function getInventoryCache(): InventoryCache {
+        return $this->inventoryCache;
+    }
+
+    public function getPositionCache(): PositionCache {
+        return $this->positionCache;
     }
 
     public function getStatus(): int {
