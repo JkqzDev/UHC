@@ -16,6 +16,9 @@ final class Session {
         private string $uuid,
         private string $xuid,
         private string $name,
+        private bool $host = false,
+        private bool $spectator = false,
+        private bool $scattered = false
     ) {
         $this->setScoreboard(new ScoreboardBuilder($this, '&l&3Cloud UHC&r'));
     }
@@ -27,6 +30,22 @@ final class Session {
     public function getName(): string {
         return $this->name;
     }
+    
+    public function isHost(): bool {
+        return $this->host;
+    }
+    
+    public function isSpectator(): bool {
+        return $this->spectator;
+    }
+    
+    public function isScattered(): bool {
+        return $this->scattered;
+    }
+    
+    public function isOnline(): bool {
+        return $this->getPlayer() !== null;
+    }
 
     public function getPlayer(): ?Player {
         return Server::getInstance()->getPlayerByRawUUID($this->uuid);
@@ -34,6 +53,18 @@ final class Session {
 
     public function setName(string $name): void {
         $this->name = $name;
+    }
+    
+    public function setSpectator(bool $spectator): void {
+        $this->spectator = $spectator;
+    }
+    
+    public function setHost(bool $host): void {
+        $this->host = $host;
+    }
+    
+    public function setScattered(bool $scattered): void {
+        $this->scattered = $scattered;
     }
 
     public function update(): void {

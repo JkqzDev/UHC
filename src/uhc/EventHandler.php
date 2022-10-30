@@ -6,9 +6,12 @@ namespace uhc;
 
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Living;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\ItemIds;
@@ -25,7 +28,7 @@ final class EventHandler implements Listener {
         $block = $event->getBlock();
         $item = $event->getItem();
         $player = $event->getPlayer();
-        $game = UHC::getInstance();
+        $game = UHC::getInstance()->getGame();
         
         if ($game->getStatus() < GameStatus::RUNNING) {
             if ($player->hasPermission('build.permission')) {
@@ -82,19 +85,6 @@ final class EventHandler implements Listener {
 
         $event->setJoinMessage(TextFormat::colorize('&7[&a+&7] &a' . $player->getName()));
     }
-
-    public function handleLogin(PlayerLoginEvent $event): void {
-        $player = $event->getPlayer();
-        $session = SessionFactory::get($player);
-
-        if ($session === null) {
-            SessionFactory::create($player);
-        } else {
-            if ($session->getName() !== $player->getName()) {
-                $session->setName($player->getName());
-            }
-        }
-    }
     
     public function handleMove(PlayerMoveEvent $event): void {
         $from = $event->getFrom();
@@ -107,6 +97,19 @@ final class EventHandler implements Listener {
                 if (!$game->getBorder()->insideBorder($player)) {
                     $game->getBorder()->teleportInside($player);
                 }
+            }
+        }
+    }
+
+    public function handleLogin(PlayerLoginEvent $event): void {
+        $player = $event->getPlayer();
+        $session = SessionFactory::get($player);
+
+        if ($session === null) {
+            SessionFactory::create($player);
+        } else {
+            if ($session->getName() !== $player->getName()) {
+                $session->setName($player->getName());
             }
         }
     }

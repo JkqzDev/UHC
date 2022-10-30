@@ -9,6 +9,7 @@ use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\utils\TextFormat;
+use uhc\session\SessionFactory;
 use uhc\session\Session;
 use uhc\UHC;
 
@@ -18,8 +19,7 @@ final class ScoreboardBuilder {
         private Session $session,
         private string $title = '',
         private array $lines = []
-    ) {
-    }
+    ) {}
 
     public function spawn(): void {
         $packet = SetDisplayObjectivePacket::create(
@@ -81,6 +81,46 @@ final class ScoreboardBuilder {
 
         if ($player === null || !$player->isOnline()) {
             return;
+        }
+        $lines = [
+            '&7'
+        ];
+        
+        switch ($game->getStatus()) {
+            case GameStatus::WAITING:
+                $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
+                    return $target->isOnline() && !$target->isHost();
+                });
+                $scenarios = array_values(array_filter(ScenarioFactory::getAll(), function (Scenario $scenario): bool {
+                    return $scenario->isEnabled();
+                }));
+                
+                $lines[] = ' &fPlayers: &b' . count($players);
+                $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO');
+                $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
+                $lines[] = '&r';
+                $lines[] = ' &fScenarios:';
+                
+                if (count($scenarios) === 0) {
+                    $lines[] = ' &4No scenarios';
+                } else {
+                    for ($i = 0; $i < 3; $i++) {
+                        if (isset($scenarios[$i])) {
+                            $lines[] = ' &7•&b ' . $scenarios[$i]->getName();
+                        }
+                    }
+                    
+                    if (count($scenarios) > 3) {
+                        $lines[] = '  &band ' . (count($scenarios) - 3) . ' more..';
+                    }
+                }
+                break;
+        }
+        $lines[] = '&7&r';
+        $this->clear();
+
+        foreach ($lines as $line) {
+            $this->addLine(TextFormat::colorize($line));
         }
     }
 }
