@@ -9,8 +9,11 @@ use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\utils\TextFormat;
+use uhc\game\GameStatus;
 use uhc\session\SessionFactory;
 use uhc\session\Session;
+use uhc\scenario\ScenarioFactory;
+use uhc\scenario\Scenario;
 use uhc\UHC;
 
 final class ScoreboardBuilder {
