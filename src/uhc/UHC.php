@@ -6,6 +6,8 @@ namespace uhc;
 
 use pocketmine\plugin\PluginBase;
 use uhc\game\Game;
+use uhc\scenario\ScenarioFactory;
+use uhc\scenario\ScenarioHandler;
 use uhc\session\SessionFactory;
 use uhc\world\WorldFactory;
 
@@ -25,6 +27,7 @@ final class UHC extends PluginBase {
 
     protected function onEnable(): void
     {
+        ScenarioFactory::loadAll();
         WorldFactory::loadAll();
         SessionFactory::task();
 
@@ -38,6 +41,7 @@ final class UHC extends PluginBase {
 
     private function registerHandlers(): void {
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler, $this);
+        $this->getServer()->getPluginManager()->registerEvents(new ScenarioHandler, $this);
     }
 
     public function getGame(): Game {

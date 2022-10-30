@@ -1,0 +1,5 @@
+name: UHC
+version: 1.0
+author: JuqnGOOD
+main: uhc\UHC
+api: 4.0.0
