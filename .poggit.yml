@@ -1,0 +1,8 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/JkqzDev/UHC
+build-by-default: true
+branches:
+- main
+projects:
+  UHC:
+    path: ""
+...
