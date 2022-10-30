@@ -9,8 +9,8 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
-use uhc\game\border\filler\BorderFillderTask;
 use uhc\game\border\filler\BorderFiller;
+use uhc\game\border\filler\BorderFillerTask;
 use uhc\game\GameStatus;
 use uhc\UHC;
 
@@ -149,7 +149,7 @@ final class BorderHandler {
     }
     
     public function createBorder(): void {
-        UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new BorderFillderTask, 10);
+        UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new BorderFillerTask, 10);
     }
     
     public function teleportInside(Living $player): void {
@@ -206,11 +206,11 @@ final class BorderHandler {
             Server::getInstance()->broadcastMessage(TextFormat::colorize('&d[+] Final Arena'));
         }
         $this->createBorder();
-        Server::getInstance()->broadcastMessage(TextFormat::colorize('&b[+] The border has been shrank to ' . $this->getSize() . 'x' . $this->getSize()));
+        Server::getInstance()->broadcastMessage(TextFormat::colorize('&3[+] &bThe border has been shrank to ' . $this->getSize() . 'x' . $this->getSize()));
         $this->teleportPlayers();
     }
     
-    public function task(): void {
+    public function schedule(): void {
         $game = UHC::getInstance()->getGame();
         
         if ($game->getStatus() === GameStatus::RUNNING) {
@@ -224,7 +224,7 @@ final class BorderHandler {
 
                 if (count($broadcastMatches) > 0) {
                     $broadcastTime = $broadcastMatches[array_key_first($broadcastMatches)];
-                    Server::getInstance()->broadcastMessage(TextFormat::colorize('&d[+] The border will shrink to ' . $borderSize . 'x' . $borderSize . ' in ' . $broadcastTime . ' second(s)'));
+                    Server::getInstance()->broadcastMessage(TextFormat::colorize('&3[+] &bThe border will shrink to ' . $borderSize . 'x' . $borderSize . ' in ' . $broadcastTime . ' second(s)'));
                 }
 
                 if ($game->getGlobalTime() === ($borderTime * 60)) {

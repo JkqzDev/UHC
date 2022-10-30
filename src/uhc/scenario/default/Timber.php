@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace uhc\scenario\defaults;
+namespace uhc\scenario\default;
 
-use uhc\scenario\Scenario;
-use uhc\UHC;
 use pocketmine\block\Block;
 use pocketmine\block\Wood;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\player\Player;
+use uhc\scenario\Scenario;
+use uhc\UHC;
 
 final class Timber extends Scenario {
     

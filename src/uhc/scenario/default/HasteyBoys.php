@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace uhc\scenario\defaults;
+namespace uhc\scenario\default;
 
-use uhc\scenario\Scenario;
-use uhc\UHC;
 use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\item\Axe;
 use pocketmine\item\enchantment\EnchantmentInstance;
@@ -13,6 +11,8 @@ use pocketmine\item\enchantment\VanillaEnchantments;
 use pocketmine\item\Pickaxe;
 use pocketmine\item\Shovel;
 use pocketmine\scheduler\ClosureTask;
+use uhc\scenario\Scenario;
+use uhc\UHC;
 
 final class HasteyBoys extends Scenario {
     

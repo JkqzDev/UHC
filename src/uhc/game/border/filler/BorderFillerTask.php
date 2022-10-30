@@ -7,7 +7,7 @@ namespace uhc\game\border\filler;
 use pocketmine\scheduler\Task;
 use uhc\UHC;
 
-final class BorderFillderTask extends Task {
+final class BorderFillerTask extends Task {
     
     public function __construct(
         private int $wallIndex = 0

@@ -17,7 +17,7 @@ final class Session {
         private string $xuid,
         private string $name,
     ) {
-        $this->setScoreboard(new ScoreboardBuilder($this, '&l&bUHC&r'));
+        $this->setScoreboard(new ScoreboardBuilder($this, '&l&3Cloud UHC&r'));
     }
 
     public function getXuid(): string {

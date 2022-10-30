@@ -24,7 +24,7 @@ final class Game {
         private int $graceTime = 20 * 60,
         private int $finalhealTime = 10 * 60,
         private int $globalmuteTime = 15 * 60,
-        private ?World $word = null
+        private ?World $world = null
     ) {
         $this->properties = new GameProperties;
         $this->border = new BorderHandler;

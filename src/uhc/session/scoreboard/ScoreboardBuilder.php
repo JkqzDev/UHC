@@ -10,6 +10,7 @@ use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\utils\TextFormat;
 use uhc\session\Session;
+use uhc\UHC;
 
 final class ScoreboardBuilder {
 
@@ -75,6 +76,8 @@ final class ScoreboardBuilder {
     public function update(): void {
         $session = $this->session;
         $player = $session->getPlayer();
+        
+        $game = UHC::getInstance()->getGame();
 
         if ($player === null || !$player->isOnline()) {
             return;

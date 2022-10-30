@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace uhc\scenario;
 
-use uhc\scenario\Fireless;
-use uhc\scenario\HasteyBoys;
-use uhc\scenario\NoFall;
-use uhc\scenario\Timber;
 use pocketmine\event\Event;
+use uhc\scenario\default\Fireless;
+use uhc\scenario\default\HasteyBoys;
+use uhc\scenario\default\NoFall;
+use uhc\scenario\default\Timber;
 
 final class ScenarioFactory {
     

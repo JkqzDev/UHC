@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace uhc\scenario\defaults;
+namespace uhc\scenario\default;
 
-use uhc\scenario\Scenario;
 use pocketmine\event\entity\EntityDamageEvent;
+use uhc\scenario\Scenario;
 
 final class NoFall extends Scenario {
     
