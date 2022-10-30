@@ -8,7 +8,12 @@ use uhc\session\Session;
 
 final class TeamFactory {
 
+    static private TeamProperties $properties;
     static private array $teams = [];
+
+    static public function getProperties(): TeamProperties {
+        return self::$properties;
+    }
 
     static public function get(int $id): ?Team {
         return self::$teams[$id] ?? null;
@@ -28,5 +33,9 @@ final class TeamFactory {
             return;
         }
         unset(self::$teams[$id]);
+    }
+
+    static public function loadAll(): void {
+        self::$properties = new TeamProperties;
     }
 }

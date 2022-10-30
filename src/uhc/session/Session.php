@@ -8,6 +8,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use uhc\session\scoreboard\ScoreboardBuilder;
 use uhc\session\scoreboard\ScoreboardTrait;
+use uhc\team\Team;
 
 final class Session {
     use ScoreboardTrait;
@@ -16,9 +17,11 @@ final class Session {
         private string $uuid,
         private string $xuid,
         private string $name,
+        private int $kills = 0,
         private bool $host = false,
         private bool $spectator = false,
-        private bool $scattered = false
+        private bool $scattered = false,
+        private ?Team $team = null
     ) {
         $this->setScoreboard(new ScoreboardBuilder($this, '&l&3Cloud UHC&r'));
     }
@@ -29,6 +32,10 @@ final class Session {
 
     public function getName(): string {
         return $this->name;
+    }
+
+    public function getKills(): int {
+        return $this->kills;
     }
     
     public function isHost(): bool {
@@ -42,9 +49,17 @@ final class Session {
     public function isScattered(): bool {
         return $this->scattered;
     }
+
+    public function isAlive(): bool {
+        return !$this->spectator && !$this->host;
+    }
     
     public function isOnline(): bool {
         return $this->getPlayer() !== null;
+    }
+
+    public function getTeam(): ?Team {
+        return $this->team;
     }
 
     public function getPlayer(): ?Player {
@@ -65,6 +80,14 @@ final class Session {
     
     public function setScattered(bool $scattered): void {
         $this->scattered = $scattered;
+    }
+
+    public function setTeam(?Team $team): void {
+        $this->team = $team;
+    }
+
+    public function addKill(): void {
+        $this->kills++;
     }
 
     public function update(): void {

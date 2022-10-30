@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc\session\scoreboard;
 
+use COM;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
@@ -14,6 +15,7 @@ use uhc\session\SessionFactory;
 use uhc\session\Session;
 use uhc\scenario\ScenarioFactory;
 use uhc\scenario\Scenario;
+use uhc\team\TeamFactory;
 use uhc\UHC;
 
 final class ScoreboardBuilder {
@@ -99,7 +101,7 @@ final class ScoreboardBuilder {
                 }));
                 
                 $lines[] = ' &fPlayers: &b' . count($players);
-                $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO');
+                $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO' . TeamFactory::getProperties()->getMaxPlayers());
                 $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
                 $lines[] = '&r';
                 $lines[] = ' &fScenarios:';
@@ -116,6 +118,58 @@ final class ScoreboardBuilder {
                     if (count($scenarios) > 3) {
                         $lines[] = '  &band ' . (count($scenarios) - 3) . ' more..';
                     }
+                }
+                break;
+
+            case GameStatus::SCATTERING:
+                $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
+                    return $target->isOnline() && !$target->isHost();
+                });
+
+                $lines[] = ' &fPlayers: &b' . count($players);
+                $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO' . TeamFactory::getProperties()->getMaxPlayers());
+                $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
+                $lines[] = ' &r&r';
+                $lines[] = ' &bLoading..';
+                break;
+
+            case GameStatus::STARTING:
+                $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
+                    return $target->isOnline() && !$target->isHost();
+                });
+
+                $lines[] = ' &fPlayers: &b' . count($players);
+                $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO' . TeamFactory::getProperties()->getMaxPlayers());
+                $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
+                $lines[] = ' &r&r';
+                $lines[] = ' &bStarting in: &b' . $game->getStartingTime() . 's';
+                break;
+
+            case GameStatus::RUNNING:
+                $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
+                    return $target->isAlive();
+                });
+                $totalPlayers = array_filter(SessionFactory::getAll(), function (Session $target): bool {
+                    return $target->isScattered() && !$target->isHost();
+                });
+
+                $lines[] = ' &fGame Time: &b' . gmdate('H:i:s', $game->getGlobalTime());
+                $lines[] = ' &fPlayers: &b' . count($players) . '/' . count($totalPlayers);
+                $lines[] = ' &fKills: &b' . $session->getKills();
+
+                if ($game->getProperties()->isTeam() && $session->getTeam() !== null) {
+                    $lines[] = ' &fTeam Kills: &b' . $session->getTeam()->getKills();
+                }
+                $nextSize = !$game->getBorder()->canShrink() ? '' : ' &7(&c' . ((($game->getBorder()->getNextTime() * 60) - $game->getGlobalTime()) >= 60 ? floor((($game->getBorder()->getNextTime() * 60) - $game->getGlobalTime()) / 60) + 1 . 'm' : (($game->getBorder()->getNextTime() * 60) - $game->getGlobalTime()) . 's') . '&7)';
+                $lines[] = ' &fBorder: &b' . $game->getBorder()->getSize() . $nextSize;
+
+                if ($session->isHost()) {
+                    $spectators = array_filter(SessionFactory::getAll(), function (Session $spectator): bool {
+                        return $spectator->isOnline() && $spectator->isSpectator();
+                    });
+                    $lines[] = ' &r&r';
+                    $lines[] = ' &fSpectators: &b' . count($spectators);
+                    $lines[] = ' &fTPS: &b' . $player->getServer()->getTicksPerSecond() . ' (' . $player->getServer()->getTickUsage() . ')';
                 }
                 break;
         }

@@ -17,6 +17,15 @@ final class Team {
     ) {
     }
 
+    public function getKills(): int {
+        $kills = 0;
+
+        foreach ($this->members as $member) {
+            $kills += $member->getKills();
+        }
+        return $kills;
+    }
+
     public function getMembers(): array {
         return $this->members;
     }

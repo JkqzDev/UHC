@@ -6,3 +6,5 @@ api: 4.0.0
 permissions:
   build.permission:
     default: op
+  globalmute.command:
+    default: op
