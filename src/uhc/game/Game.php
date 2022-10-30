@@ -80,7 +80,23 @@ final class Game {
     public function setStatus(int $status): void {
         $this->status = $status;
     }
-
+    
+    public function setStartingTime(int $time): void {
+        $this->startingTime = $time;
+    }
+    
+    public function setGraceTime(int $time): void {
+        $this->graceTime = $time;
+    }
+    
+    public function setFinalHealTime(int $time): void {
+        $this->finalhealTime = $time;
+    }
+    
+    public function setGlobalmuteTime(int $time): void {
+        $this->globalmuteTime = $time;
+    }
+    
     public function setWorld(World $word): void {
         $this->world = $word;
     }
