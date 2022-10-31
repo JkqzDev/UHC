@@ -8,6 +8,9 @@ use pocketmine\world\World;
 use uhc\game\border\BorderHandler;
 use uhc\game\cache\InventoryCache;
 use uhc\game\cache\PositionCache;
+use uhc\session\Session;
+use uhc\session\SessionFactory;
+use uhc\team\TeamFactory;
 
 final class Game {
 
@@ -99,5 +102,41 @@ final class Game {
     
     public function setWorld(World $word): void {
         $this->world = $word;
+    }
+    
+    public function checkWinner(): void {
+        if ($this->properties->isTeam()) {
+            return;
+        }
+        $players = array_filter(SessionFactory::getAll(), function (Session $session): bool {
+            return $session->isAlive() && $session->isScattered();
+        });
+    }
+    
+    public function startScattering(): void {
+        $this->status = GameStatus::SCATTERING;
+        
+        if ($this->properties->isTeam()) {
+            $sessions = array_filter(SessionFactory::getAll(), function (Session $session): bool {
+                return $session->isOnline() && $session->getTeam() === null;
+            });
+            
+            foreach ($sessions as $session) {
+                TeamFactory::create($session);
+            }
+        }
+        $this->properties->setGlobalMute(true);
+    }
+    
+    public function startGame(): void {
+        $this->status = GameStatus::STARTING;
+        
+        
+    }
+    
+    public function stopGame(): void {
+    }
+    
+    public function running(): void {
     }
 }
