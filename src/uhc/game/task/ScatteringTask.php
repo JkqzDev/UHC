@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace uhc\game;
+namespace uhc\game\task;
 
 use pocketmine\scheduler\Task;
+use uhc\game\GameStatus;
 use uhc\session\Session;
 use uhc\session\SessionFactory;
 use uhc\team\Team;

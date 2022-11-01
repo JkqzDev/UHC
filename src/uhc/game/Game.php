@@ -13,6 +13,7 @@ use uhc\event\GameStopEvent;
 use uhc\game\border\BorderHandler;
 use uhc\game\cache\InventoryCache;
 use uhc\game\cache\PositionCache;
+use uhc\game\task\ScatteringTask;
 use uhc\session\Session;
 use uhc\session\SessionFactory;
 use uhc\team\Team;
