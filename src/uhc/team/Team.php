@@ -21,7 +21,8 @@ final class Team {
         private int $id,
         private Session $owner,
         private bool $scattered = false,
-        private array $members = []
+        private array $members = [],
+        private ?Position $position = null
     ) {
         $this->addMember($owner);
     }
@@ -125,10 +126,18 @@ final class Team {
                 $member->setScattered(true);
             }
             $this->scattered = true;
+            $this->position = $position;
         }));
     }
 
     public function disband(): void {
+        /** @var Session[] */
+        $members = $this->members;
+
+        foreach ($members as $member) {
+            $member->setTeam(null);
+            $member->getPlayer()?->sendMessage(TextFormat::colorize('&cThe team was disbaned'));
+        }
         TeamFactory::remove($this->id);
     }
 }

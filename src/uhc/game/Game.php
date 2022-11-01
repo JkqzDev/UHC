@@ -16,6 +16,7 @@ use uhc\session\Session;
 use uhc\session\SessionFactory;
 use uhc\team\Team;
 use uhc\team\TeamFactory;
+use uhc\UHC;
 
 final class Game {
 
@@ -150,13 +151,14 @@ final class Game {
             }
         }
         $this->properties->setGlobalMute(true);
+        UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ScatteringTask, 15);
     }
     
     public function startGame(): void {
         $event = new GameStartEvent($this);
         $event->call();
 
-        $this->status = GameStatus::STARTING;
+        $this->status = GameStatus::RUNNING;
     }
     
     public function stopGame(): void {
