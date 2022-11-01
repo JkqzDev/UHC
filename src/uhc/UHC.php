@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc;
 
+use muqsit\invmenu\InvMenuHandler;
 use pocketmine\plugin\PluginBase;
 use uhc\command\GlobalMuteCommand;
 use uhc\command\HelpopCommand;
@@ -46,6 +47,12 @@ final class UHC extends PluginBase {
         $this->registerGame();
         $this->registerHandlers();
         $this->registerCommands();
+    }
+
+    private function registerLibraries(): void {
+        if (!InvMenuHandler::isRegistered()) {
+            InvMenuHandler::register($this);
+        }
     }
 
     private function registerGame(): void {
