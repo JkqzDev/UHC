@@ -10,6 +10,8 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerLoginEvent;
@@ -75,6 +77,24 @@ final class EventHandler implements Listener {
             return;
         }
         $entity->setScoreTag(TextFormat::colorize('&f' . round(($entity->getHealth() + $entity->getAbsorption()), 1) . '&c♥'));
+    }
+
+    public function handleChat(PlayerChatEvent $event): void {
+        $player = $event->getPlayer();
+        $game = UHC::getInstance()->getGame();
+
+        if ($game->getProperties()->isGlobalMute() && !$player->hasPermission('globalmute.bypass')) {
+            $event->cancel();
+            return;
+        }
+    }
+
+    public function handleExhaust(PlayerExhaustEvent $event): void {
+        $game = UHC::getInstance()->getGame();
+
+        if ($game->getStatus() < GameStatus::RUNNING) {
+            $event->cancel();
+        }
     }
     
     public function handleJoin(PlayerJoinEvent $event): void {
