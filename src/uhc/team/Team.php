@@ -70,6 +70,10 @@ final class Team {
         return count($members) > 0;
     }
 
+    public function equals(?Team $team): bool {
+        return $team !== null && $this->id === $team->getId();
+    }
+
     public function addMember(Session $session): void {
         $this->members[spl_object_hash($session)] = $session;
     }

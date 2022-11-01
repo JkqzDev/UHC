@@ -59,7 +59,7 @@ final class WorldCopyAsync extends AsyncTask {
         $callback = $this->callback;
 
         if ($callback !== null) {
-            Server::getInstance()->getWorldManager()->loadWorld($worldName);
+            Server::getInstance()->getWorldManager()->loadWorld($worldName, true);
             $callback(Server::getInstance()->getWorldManager()->getWorldByName($worldName));
         }
     }

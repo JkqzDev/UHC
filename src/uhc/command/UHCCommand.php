@@ -85,7 +85,6 @@ final class UHCCommand extends Command {
                         $game->getProperties()->setHost($sender->getName());
                         
                         $sender->sendMessage(TextFormat::colorize('&aSetup finished!'));
-                        $session->setHost(true);
                     }
                 );
                 break;

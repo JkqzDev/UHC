@@ -11,6 +11,7 @@ use uhc\command\HelpopCommand;
 use uhc\command\PingCommand;
 use uhc\command\TellCommand;
 use uhc\command\TopKillsCommand;
+use uhc\command\UHCCommand;
 use uhc\game\Game;
 use uhc\scenario\command\ScenariosCommand;
 use uhc\scenario\ScenarioFactory;
@@ -92,6 +93,7 @@ final class UHC extends PluginBase {
             new PingCommand,
             new TellCommand,
             new TopKillsCommand,
+            new UHCCommand,
             // Scenarios
             new ScenariosCommand,
             // Team

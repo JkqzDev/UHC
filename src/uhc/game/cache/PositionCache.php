@@ -12,15 +12,15 @@ final class PositionCache {
         private array $positions = []
     ) {}
     
-    public function getPosition(string $identificator): ?Position {
-        return $this->positions[$identificator] ?? null;
+    public function getPosition(string $player): ?Position {
+        return $this->positions[$player] ?? null;
     }
     
-    public function addPosition(string $identificator, Position $position): void {
-        $this->positions[$identificator] = $position;
+    public function addPosition(string $player, Position $position): void {
+        $this->positions[$player] = $position;
     }
     
-    public function removePosition(string $identificator): void {
-        unset($this->positions[$identificator]);
+    public function removePosition(string $player): void {
+        unset($this->positions[$player]);
     }
 }

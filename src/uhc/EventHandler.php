@@ -8,9 +8,12 @@ use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Living;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\entity\EntityDamageByEntityEvent;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -21,9 +24,12 @@ use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use uhc\game\GameStatus;
+use uhc\session\Session;
 use uhc\session\SessionFactory;
 
 final class EventHandler implements Listener {
+
+    private array $lastHit = [];
     
     public function handleBreak(BlockBreakEvent $event): void
     {
@@ -63,6 +69,60 @@ final class EventHandler implements Listener {
             }
         }
     }
+
+    public function handleDamage(EntityDamageEvent $event): void {
+        $cause = $event->getCause();
+        $player = $event->getEntity();
+        $game = UHC::getInstance()->getGame();
+
+        if (!$player instanceof Player) {
+            return;
+        }
+        $session = SessionFactory::get($player);
+
+        if ($session === null) {
+            return;
+        }
+
+        if ($cause === EntityDamageEvent::CAUSE_VOID) {
+            $player->teleport($player->getWorld()->getSpawnLocation());
+        }
+
+        if ($game->getStatus() !== GameStatus::RUNNING) {
+            $event->cancel();
+            return;
+        }
+
+        if ($cause === EntityDamageEvent::CAUSE_ENTITY_ATTACK && $game->getGlobalTime() > $game->getGraceTime()) {
+            $event->cancel();
+            return;
+        }
+
+        if ($event instanceof EntityDamageByEntityEvent) {
+            $damager = $event->getDamager();
+
+            if (!$damager instanceof Player) {
+                return;
+            }
+            $damager_session = SessionFactory::get($damager);
+
+            if ($damager_session === null) {
+                return;
+            }
+
+            if ($game->getProperties()->isTeam() && $damager_session->getTeam() !== null) {
+                if ($damager_session->getTeam()->equals($session->getTeam())) {
+                    $event->cancel();
+                    return;
+                }
+            }
+            $this->lastHit[$player->getXuid()] = [
+                'damager' => $damager_session,
+                'time' => time() + 15
+            ];
+        }
+        $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . '&c♥'));
+    }
     
     public function handleRegainHealth(EntityRegainHealthEvent $event): void {
         $cause = $event->getRegainReason();
@@ -87,6 +147,37 @@ final class EventHandler implements Listener {
             $event->cancel();
             return;
         }
+    }
+
+    public function handleDeath(PlayerDeathEvent $event): void {
+        $player = $event->getPlayer();
+        $session = SessionFactory::get($player);
+        $game = UHC::getInstance()->getGame();
+
+        if ($session === null || $game->getStatus() !== GameStatus::RUNNING) {
+            return;
+        }
+        $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 
+
+        if (isset($this->lastHit[$player->getXuid()])) {
+            $data = $this->lastHit[$player->getXuid()];
+            
+            if ($data['time'] > time()) {
+                /** @var Session */
+                $damager = $this->lastHit[$player->getXuid()];
+                $damager->addKill();
+
+                $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &ewas slain by &c' . $damager->getName() . ' &7[&f' . $damager->getKills() . '&7]';
+            }
+        }
+        $session->setSpectator(true);
+        $player->setSpawn($player->getPosition()->add(0, 3, 0));
+
+        $game->getInventoryCache()->addInventory($player->getXuid(), $player->getArmorInventory()->getContents(), $player->getInventory()->getContents());
+        $game->getPositionCache()->addPosition($player->getXuid(), $player->getPosition());
+        $game->checkWinner();
+
+        $event->setDeathMessage(TextFormat::colorize($message));
     }
 
     public function handleExhaust(PlayerExhaustEvent $event): void {

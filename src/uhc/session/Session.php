@@ -35,7 +35,7 @@ final class Session {
         private bool $scattered = false,
         private ?Team $team = null
     ) {
-        $this->setScoreboard(new ScoreboardBuilder($this, '&l&3Cloud UHC&r'));
+        $this->setScoreboard(new ScoreboardBuilder($this, '&l&bUHC&r'));
     }
 
     public function getXuid(): string {
