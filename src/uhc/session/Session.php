@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace uhc\session;
 
 use pocketmine\block\BlockLegacyIds;
+use pocketmine\network\mcpe\protocol\GameRulesChangedPacket;
+use pocketmine\network\mcpe\protocol\types\BoolGameRule;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\Position;
 use pocketmine\world\World;
@@ -15,6 +19,7 @@ use uhc\game\GameStatus;
 use uhc\session\scoreboard\ScoreboardBuilder;
 use uhc\session\scoreboard\ScoreboardTrait;
 use uhc\team\Team;
+use uhc\team\TeamFactory;
 use uhc\UHC;
 
 final class Session {
@@ -150,10 +155,96 @@ final class Session {
     }
 
     public function join(): void {
+        $player = $this->getPlayer();
+
+        if ($player === null) {
+            return;
+        }
+        $game = UHC::getInstance()->getGame();
+
         $this->scoreboard?->spawn();
+        $pk = GameRulesChangedPacket::create([
+            'showCoordinates' => new BoolGameRule(true, false)
+        ]);
+        $player->getNetworkSession()->sendDataPacket($pk);
+
+        switch ($game->getStatus()) {
+            case GameStatus::WAITING:
+                $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
+                $player->setGamemode(GameMode::ADVENTURE());
+
+                $this->clear();
+                break;
+
+            case GameStatus::SCATTERING:
+                if ($game->getProperties()->isTeam()) {
+                    $team = $this->team;
+                    
+                    if ($team !== null) {
+                        if (!$team->isScattered()) {
+                            $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
+                            $player->setGamemode(GameMode::ADVENTURE());
+                            $this->clear();
+                        } else {
+                            if (!$this->scattered) {
+                                $player->teleport($game->getWorld()->getSpawnLocation());
+                                $player->setGamemode(GameMode::SPECTATOR());
+
+                                $this->spectator = true;
+                                $this->clear();
+                            }
+                        }
+                    } else {
+                        $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
+                        $player->setGamemode(GameMode::ADVENTURE());
+                        $this->clear();
+
+                        TeamFactory::create($this);
+                    }
+                } else {
+                    if (!$this->scattered) {
+                        $player->teleport($game->getWorld()->getSpawnLocation());
+                        $player->setGamemode(GameMode::ADVENTURE());
+
+                        $this->clear();
+                    }
+                }
+                break;
+
+            case GameStatus::STARTING:
+            case GameStatus::RUNNING:
+            case GameStatus::RESTARTING:
+                if ($this->isAlive()) {
+                    if (!$this->scattered) {
+                        $player->teleport($game->getWorld()->getSpawnLocation());
+                        $player->setGamemode(GameMode::SPECTATOR());
+                        
+                        $this->spectator = true;
+                        $this->clear();
+                    }
+                }
+                break;
+        }
+
+        $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . ' &c♥'));
     }
 
     public function quit(): void {
         
+    }
+
+    public function clear(): void {
+        $player = $this->getPlayer();
+
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+        $player->getOffHandInventory()->clearAll();
+        
+        $player->getEffects()->clear();
+
+        $player->setHealth($player->getMaxHealth());
+        $player->getHungerManager()->setFood($player->getHungerManager()->getMaxFood());
+
+        $player->extinguish();
     }
 }

@@ -29,7 +29,9 @@ final class TeamFactory {
         while (self::get($id) !== null) {
             $id++;
         }
-        self::$teams[$id] = new Team($id, $owner);
+        self::$teams[$id] = $team = new Team($id, $owner);
+
+        $owner->setTeam($team);
     }
 
     static public function remove(int $id): void {

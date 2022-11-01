@@ -210,7 +210,7 @@ final class BorderHandler {
         $this->teleportPlayers();
     }
     
-    public function schedule(): void {
+    public function running(): void {
         $game = UHC::getInstance()->getGame();
         
         if ($game->getStatus() === GameStatus::RUNNING) {

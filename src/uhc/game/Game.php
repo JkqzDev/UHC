@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc\game;
 
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
@@ -40,6 +41,11 @@ final class Game {
 
         $this->inventoryCache = new InventoryCache;
         $this->positionCache = new PositionCache;
+
+        UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+            $this->running();
+            $this->border->running();
+        }), 20);
     }
 
     public function getProperties(): GameProperties {
