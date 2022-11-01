@@ -10,6 +10,8 @@ use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerItemUseEvent;
+use uhc\event\GameStartEvent;
+use uhc\event\GameStopEvent;
 
 abstract class Scenario {
     
@@ -60,5 +62,11 @@ abstract class Scenario {
     }
     
     public function handleItemUse(PlayerItemUseEvent $event): void {
+    }
+
+    public function handleStart(GameStartEvent $event): void {
+    }
+
+    public function handleStop(GameStopEvent $event): void {
     }
 }

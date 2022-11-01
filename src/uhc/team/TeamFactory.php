@@ -15,6 +15,10 @@ final class TeamFactory {
         return self::$properties;
     }
 
+    static public function getAll(): array {
+        return self::$teams;
+    }
+
     static public function get(int $id): ?Team {
         return self::$teams[$id] ?? null;
     }

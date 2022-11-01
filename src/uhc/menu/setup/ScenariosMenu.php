@@ -62,7 +62,7 @@ final class ScenariosMenu {
                     $item->setCustomName(TextFormat::colorize('&r' . $scenario->getName()));
                     $item->setLore([
                         TextFormat::colorize('&r&7------------------------'),
-                        TextFormat::colorize('&r' . ($scenario->isActive() ? '&aScenario enabled' : '&cScenario disabled')),
+                        TextFormat::colorize('&r' . ($scenario->isEnabled() ? '&aScenario enabled' : '&cScenario disabled')),
                         TextFormat::colorize('&r&7------------------------')
                     ]);
                     $menu->getInventory()->setItem($action->getSlot(), $item);

@@ -21,15 +21,13 @@ final class AnnouncementMenu {
         Player $player,
         private int $waiting_time = 5 * 60
     ) {
-        $game = UHC::getInstance()->getGame();
-
         $max = 30 * 60;
         $min = 60;
 
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->getInventory()->setContents($this->getItems($max, $min));
 
-        $menu->setListener(function (InvMenuTransaction $transaction) use ($menu, $game, $max, $min): InvMenuTransactionResult {
+        $menu->setListener(function (InvMenuTransaction $transaction) use ($menu, $max, $min): InvMenuTransactionResult {
             $item = $transaction->getItemClicked();
             $player = $transaction->getPlayer();
             $custom_name = TextFormat::clean($item->getCustomName());
@@ -46,7 +44,7 @@ final class AnnouncementMenu {
             }
             
             if ($custom_name === 'Announce') {
-                # $game->getFeed()->sendAnnouncement($this->waiting_time);
+                // Announce message
                 return $transaction->discard();
             }
             

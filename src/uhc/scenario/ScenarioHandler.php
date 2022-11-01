@@ -11,6 +11,8 @@ use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerItemUseEvent;
+use uhc\event\GameStartEvent;
+use uhc\event\GameStopEvent;
 use uhc\game\GameStatus;
 use uhc\UHC;
 
@@ -64,6 +66,24 @@ final class ScenarioHandler implements Listener {
     public function handleItemUse(PlayerItemUseEvent $event): void {
         $plugin = UHC::getInstance();
         
+        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+            return;
+        }
+        ScenarioFactory::callEvent(__FUNCTION__, $event);
+    }
+
+    public function handleStart(GameStartEvent $event): void {
+        $plugin = UHC::getInstance();
+
+        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+            return;
+        }
+        ScenarioFactory::callEvent(__FUNCTION__, $event);
+    }
+
+    public function handleStop(GameStopEvent $event): void {
+        $plugin = UHC::getInstance();
+
         if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
             return;
         }

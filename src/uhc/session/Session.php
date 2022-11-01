@@ -4,11 +4,18 @@ declare(strict_types=1);
 
 namespace uhc\session;
 
+use pocketmine\block\BlockLegacyIds;
 use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
+use pocketmine\world\format\Chunk;
+use pocketmine\world\Position;
+use pocketmine\world\World;
+use uhc\game\GameStatus;
 use uhc\session\scoreboard\ScoreboardBuilder;
 use uhc\session\scoreboard\ScoreboardTrait;
 use uhc\team\Team;
+use uhc\UHC;
 
 final class Session {
     use ScoreboardTrait;
@@ -92,6 +99,54 @@ final class Session {
 
     public function update(): void {
         $this->scoreboard?->update();
+    }
+
+    public function scatter(): void {
+        $player = $this->getPlayer();
+
+        if ($player === null) {
+            return;
+        }
+        $game = UHC::getInstance()->getGame();
+        $border = $game->getBorder()->getSize() - 1;
+        $world = $game->getWorld();
+
+        if ($world === null) {
+            return;
+        }
+
+        UHC::getInstance()->getScheduler()->scheduleTask(new ClosureTask(function () use ($player, $game, $border, $world): void {
+            $x = mt_rand(-$border, $border);
+            $z = mt_rand(-$border, $border);
+
+            if (!$world->isChunkLoaded($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE)) {
+                $world->loadChunk($x >> Chunk::COORD_BIT_SIZE, $z >> Chunk::COORD_BIT_SIZE);
+            }
+            $y = $world->getHighestBlockAt($x, $z);
+            $position = new Position($x, $y, $z, $world);
+            /*$x = mt_rand(-$border, $border);
+            $y = World::Y_MAX;
+            $z = mt_rand(-$border, $border);
+
+            $position = new Position($x, $y, $z, $world);
+            $player->teleport($position);
+
+            $y = $world->getHighestBlockAt($x, $z);
+            $position->y = $y;*/
+
+            if (in_array($world->getBlock($position->asVector3()->add(0, -1, 0))->getId(), [BlockLegacyIds::FLOWING_LAVA, BlockLegacyIds::LAVA, BlockLegacyIds::WATER, BlockLegacyIds::FLOWING_WATER])) {
+                $this->scatter();
+                return;
+            }
+
+            if ($game->getStatus() !== GameStatus::RUNNING) {
+                $player->setImmobile();
+            }
+            $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
+
+            $this->spectator = false;
+            $this->scattered = true;
+        }));
     }
 
     public function join(): void {
