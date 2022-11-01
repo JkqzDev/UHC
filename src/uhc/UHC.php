@@ -45,18 +45,19 @@ final class UHC extends PluginBase {
         $this->unregisterCommands();
 
         $this->registerGame();
+        $this->registerLibraries();
         $this->registerHandlers();
         $this->registerCommands();
+    }
+
+    private function registerGame(): void {
+        $this->game = new Game;
     }
 
     private function registerLibraries(): void {
         if (!InvMenuHandler::isRegistered()) {
             InvMenuHandler::register($this);
         }
-    }
-
-    private function registerGame(): void {
-        $this->game = new Game;
     }
 
     private function registerHandlers(): void {
