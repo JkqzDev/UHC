@@ -13,6 +13,7 @@ use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 use uhc\menu\SetupMenu;
+use uhc\scenario\Scenario;
 use uhc\scenario\ScenarioFactory;
 use uhc\UHC;
 
@@ -20,13 +21,15 @@ final class ScenariosMenu {
     
     public function __construct(Player $player) {
         $menu = InvMenu::create(InvMenu::TYPE_CHEST);
-        
-        foreach (ScenarioFactory::getAll() as $scenario) {
+        /** @var Scenario[] */
+        $scenarios = ScenarioFactory::getAll();
+
+        foreach ($scenarios as $scenario) {
             $item = ItemFactory::getInstance()->get(ItemIds::BOOK);
             $item->setCustomName(TextFormat::colorize('&r' . $scenario->getName()));
             $item->setLore([
                 TextFormat::colorize('&r&7------------------------'),
-                TextFormat::colorize('&r' . ($scenario->isActive() ? '&aScenario enabled' : '&cScenario disabled')),
+                TextFormat::colorize('&r' . ($scenario->isEnabled() ? '&aScenario enabled' : '&cScenario disabled')),
                 TextFormat::colorize('&r&7------------------------')
             ]);
             $menu->getInventory()->addItem($item);

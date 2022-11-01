@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace uhc\scenario;
 
 use pocketmine\event\Event;
+use uhc\scenario\default\BloodDiamond;
+use uhc\scenario\default\CatEyes;
+use uhc\scenario\default\Cutclean;
+use uhc\scenario\default\DoubleOres;
+use uhc\scenario\default\DoubleOrNothing;
 use uhc\scenario\default\Fireless;
 use uhc\scenario\default\HasteyBoys;
 use uhc\scenario\default\NoFall;
 use uhc\scenario\default\Timber;
+use uhc\scenario\default\TimeBomb;
 
 final class ScenarioFactory {
     
@@ -35,10 +41,16 @@ final class ScenarioFactory {
     }
     
     static public function loadAll(): void {
+        self::create(new BloodDiamond);
+        self::create(new CatEyes);
+        self::create(new Cutclean);
+        self::create(new DoubleOres);
+        self::create(new DoubleOrNothing);
         self::create(new Fireless);
         self::create(new HasteyBoys);
         self::create(new NoFall);
         self::create(new Timber);
+        self::create(new TimeBomb);
     }
     
     static private function sort(): void {

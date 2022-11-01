@@ -93,7 +93,7 @@ final class EventHandler implements Listener {
             return;
         }
 
-        if ($cause === EntityDamageEvent::CAUSE_ENTITY_ATTACK && $game->getGlobalTime() > $game->getGraceTime()) {
+        if ($cause === EntityDamageEvent::CAUSE_ENTITY_ATTACK && $game->getGraceTime() > $game->getGlobalTime()) {
             $event->cancel();
             return;
         }
