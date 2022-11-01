@@ -51,6 +51,10 @@ final class UHC extends PluginBase {
         $this->registerCommands();
     }
 
+    protected function onDisable(): void {
+        $this->game?->delete();        
+    }
+
     private function registerGame(): void {
         $this->game = new Game;
     }

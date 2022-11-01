@@ -19,6 +19,7 @@ use uhc\session\SessionFactory;
 use uhc\team\Team;
 use uhc\team\TeamFactory;
 use uhc\UHC;
+use uhc\world\async\WorldDeleteAsync;
 
 final class Game {
 
@@ -47,6 +48,20 @@ final class Game {
             $this->running();
             $this->border->running();
         }), 20);
+    }
+
+    public function delete(): void {
+        $world = $this->world;
+
+        if ($world !== null) {
+            $worldName = $world->getFolderName();
+
+            Server::getInstance()->getWorldManager()->unloadWorld($world);
+            Server::getInstance()->getAsyncPool()->submitTask(new WorldDeleteAsync(
+                $worldName,
+                Server::getInstance()->getDataPath() . 'worlds'
+            ));
+        }
     }
 
     public function getProperties(): GameProperties {
