@@ -123,6 +123,22 @@ final class UHCCommand extends Command {
                 $player->sendMessage(TextFormat::colorize('&cYou were removed as the game host'));
                 $sender->sendMessage(TextFormat::colorize('&cYou have removed the player ' . $player->getName() . ' as host of the game'));
                 break;
+
+            case 'time':
+                if (!isset($args[1])) {
+                    $minutes = 0;
+                } else {
+                    $minutes = (int) $args[1] * 60;
+                }
+
+                if (!isset($args[2])) {
+                    $seconds = 0;
+                } else {
+                    $seconds = (int) $args[2];
+                }
+                $time = $minutes + $seconds;
+                $game->setGlobalTime($time);
+                break;
         }
     }
 }

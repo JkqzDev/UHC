@@ -111,6 +111,10 @@ final class Game {
     public function setStatus(int $status): void {
         $this->status = $status;
     }
+
+    public function setGlobalTime(int $time): void {
+        $this->globalTime = $time;
+    }
     
     public function setStartingTime(int $time): void {
         $this->startingTime = $time;
