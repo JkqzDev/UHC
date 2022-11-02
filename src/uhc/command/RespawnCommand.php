@@ -69,7 +69,8 @@ final class RespawnCommand extends Command {
         if ($session->isScattered()) {
             $inventory = $game->getInventoryCache()->getInventory($player->getXuid());
             $position = $game->getPositionCache()->getPosition($player->getXuid());
-
+            
+            $session->setSpectator(false);
             $session->clear();
 
             $player->teleport($position);

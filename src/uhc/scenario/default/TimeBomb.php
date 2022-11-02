@@ -7,6 +7,7 @@ namespace uhc\scenario\default;
 use pocketmine\block\tile\Chest;
 use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Living;
+use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
@@ -15,6 +16,7 @@ use pocketmine\utils\TextFormat;
 use pocketmine\world\Explosion;
 use pocketmine\world\particle\FloatingTextParticle;
 use pocketmine\world\Position;
+use uhc\entity\DisconnectedMob;
 use uhc\item\GoldenHead;
 use uhc\scenario\Scenario;
 use uhc\UHC;
@@ -32,10 +34,13 @@ final class TimeBomb extends Scenario {
         if ($entity instanceof Player) {
             $inventoryContents = $entity->getInventory()->getContents();
             $name = $entity->getName();
+        } elseif ($entity instanceof DisconnectedMob) {
+            $inventoryContents = $entity->getDisconnected()->getInventory();
+            $name = $entity->getDisconnected()->getSession()->getName();
         }
         $items = array_merge($armorContents, $inventoryContents);
         $items[] = GoldenHead::create();
-        
+
         $firstPos = $entity->getPosition()->asVector3();
         $secondPos = $entity->getPosition()->subtract(($entity->getPosition()->getX() > 0 ? -1 : 1), 0, 0);
         
@@ -79,7 +84,7 @@ final class TimeBomb extends Scenario {
                         return;
                     }
                     $this->particle->setText(TextFormat::colorize('&b' . $this->countdown));
-                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0, 1, 0), $this->particle);
+                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0.5, 1, 0.5), $this->particle);
                 }
     
                 private function removeParticle(): void {
@@ -87,7 +92,7 @@ final class TimeBomb extends Scenario {
                         return;
                     }
                     $this->particle->setInvisible();
-                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0, 1, 0), $this->particle);
+                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0.5, 1, 0.5), $this->particle);
                 }
     
                 public function onRun(): void {
@@ -104,6 +109,15 @@ final class TimeBomb extends Scenario {
                     $this->updateParticle();
                 }
             }, 20);
+        }
+    }
+
+    public function handleEntityDeath(EntityDeathEvent $event): void {
+        $entity = $event->getEntity();
+
+        if ($entity instanceof DisconnectedMob && $entity->getDisconnected() !== null) {
+            $this->summonChest($entity);
+            $event->setDrops([]);
         }
     }
 

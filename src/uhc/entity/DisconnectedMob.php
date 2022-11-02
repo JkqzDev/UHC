@@ -22,6 +22,10 @@ final class DisconnectedMob extends Zombie {
     private ?Disconnected $disconnected = null;
     private ?Session $lastHit = null;
 
+    public function getDisconnected(): ?Disconnected {
+        return $this->disconnected;
+    }
+
     public function getRealName(): string {
         return $this->disconnected !== null ? $this->disconnected->getSession()->getName() : '';
     }
@@ -39,7 +43,7 @@ final class DisconnectedMob extends Zombie {
 
     public function getDrops(): array {
         if ($this->disconnected !== null) {
-            return array_merge($this->disconnected->getInventory(), $this->getArmorInventory());
+            return array_merge($this->disconnected->getInventory(), $this->getArmorInventory()->getContents());
         }
         return [];
     }
