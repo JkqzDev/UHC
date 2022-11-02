@@ -10,5 +10,7 @@ permissions:
     default: op
   globalmute.command:
     default: op
+  respawn.command:
+    default: op
   uhc.command:
     default: op
