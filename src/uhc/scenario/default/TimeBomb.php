@@ -15,6 +15,7 @@ use pocketmine\utils\TextFormat;
 use pocketmine\world\Explosion;
 use pocketmine\world\particle\FloatingTextParticle;
 use pocketmine\world\Position;
+use uhc\item\GoldenHead;
 use uhc\scenario\Scenario;
 use uhc\UHC;
 
@@ -33,7 +34,8 @@ final class TimeBomb extends Scenario {
             $name = $entity->getName();
         }
         $items = array_merge($armorContents, $inventoryContents);
-
+        $items[] = GoldenHead::create();
+        
         $firstPos = $entity->getPosition()->asVector3();
         $secondPos = $entity->getPosition()->subtract(($entity->getPosition()->getX() > 0 ? -1 : 1), 0, 0);
         

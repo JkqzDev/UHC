@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace uhc;
 
 use muqsit\invmenu\InvMenuHandler;
+use pocketmine\item\ItemFactory;
 use pocketmine\plugin\PluginBase;
 use uhc\command\GlobalMuteCommand;
 use uhc\command\HelpopCommand;
@@ -15,6 +16,7 @@ use uhc\command\TellCommand;
 use uhc\command\TopKillsCommand;
 use uhc\command\UHCCommand;
 use uhc\game\Game;
+use uhc\item\GoldenHead;
 use uhc\scenario\command\ScenariosCommand;
 use uhc\scenario\ScenarioFactory;
 use uhc\scenario\ScenarioHandler;
@@ -52,6 +54,7 @@ final class UHC extends PluginBase {
         $this->registerLibraries();
         $this->registerHandlers();
         $this->registerCommands();
+        $this->registerItems();
     }
 
     protected function onDisable(): void {
@@ -113,6 +116,10 @@ final class UHC extends PluginBase {
         foreach ($commands as $command) {
             $this->getServer()->getCommandMap()->register('UHC', $command);
         }
+    }
+
+    public function registerItems(): void {
+        ItemFactory::getInstance()->register(new GoldenHead, true);
     }
 
     public function getGame(): Game {
