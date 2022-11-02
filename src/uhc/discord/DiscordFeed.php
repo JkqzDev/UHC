@@ -53,7 +53,7 @@ final class DiscordFeed {
         
         $embed->setTitle('Game Kill');
         $embed->setColor(hexdec('00ffff'));
-        $embed->addFiel('Minute ' . (intval) $game->getGlobalTime() / 60), $message);
+        $embed->addFiel('Minute ' . ((intval) $game->getGlobalTime() / 60), $message);
         $message->addEmbed($embed);
         $webhook->send($message);
     }
