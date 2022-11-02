@@ -77,7 +77,7 @@ final class DiscordFeed {
             
             $embed->addField('Time elapsed', gmdate('H:i:s', $game->getGlobalTime()));
             $embed->addField('Team winner', 'Team #' . $team->getId());
-            $embed->addField('Team kills', implode(PHP_EOL, array_map(function (Session $session) {
+            $embed->addField('Team kills', implode(PHP_EOL, array_map(function (Session $member) {
                 return '• ' . $member->getName() . ' - ' . $member->getKills() . ' kill(s)';
             }, $team->getMembers())));
         } else {

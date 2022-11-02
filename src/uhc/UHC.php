@@ -8,7 +8,9 @@ use muqsit\invmenu\InvMenuHandler;
 use pocketmine\plugin\PluginBase;
 use uhc\command\GlobalMuteCommand;
 use uhc\command\HelpopCommand;
+use uhc\command\LateJoinCommand;
 use uhc\command\PingCommand;
+use uhc\command\RespawnCommand;
 use uhc\command\TellCommand;
 use uhc\command\TopKillsCommand;
 use uhc\command\UHCCommand;
@@ -95,7 +97,9 @@ final class UHC extends PluginBase {
             // Global
             new GlobalMuteCommand,
             new HelpopCommand,
+            new LateJoinCommand,
             new PingCommand,
+            new RespawnCommand,
             new TellCommand,
             new TopKillsCommand,
             new UHCCommand,

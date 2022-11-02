@@ -174,7 +174,7 @@ final class TeamCommand extends Command {
                 }
                 
                 if (count($team->getMembers()) === TeamFactory::getProperties()->getMaxPlayers()) {
-                    unset($this->invites[$session->getUuid()][$args[1]]);
+                    unset($this->invites[$session->getXuid()][$args[1]]);
                     $sender->sendMessage(TextFormat::colorize('&cTeam is full'));
                     return;
                 }

@@ -74,6 +74,10 @@ final class Team {
         return $team !== null && $this->id === $team->getId();
     }
 
+    public function getPosition(): ?Position {
+        return $this->position;
+    }
+
     public function addMember(Session $session): void {
         $this->members[spl_object_hash($session)] = $session;
     }
