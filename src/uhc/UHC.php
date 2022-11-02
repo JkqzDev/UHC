@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace uhc;
 
 use muqsit\invmenu\InvMenuHandler;
+use pocketmine\data\bedrock\EntityLegacyIds;
+use pocketmine\entity\EntityDataHelper;
+use pocketmine\entity\EntityFactory;
 use pocketmine\item\ItemFactory;
+use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\plugin\PluginBase;
+use pocketmine\world\World;
 use uhc\command\GlobalMuteCommand;
 use uhc\command\HelpopCommand;
 use uhc\command\LateJoinCommand;
@@ -15,8 +20,10 @@ use uhc\command\RespawnCommand;
 use uhc\command\TellCommand;
 use uhc\command\TopKillsCommand;
 use uhc\command\UHCCommand;
+use uhc\entity\DisconnectedMob;
 use uhc\game\Game;
 use uhc\item\GoldenHead;
+use uhc\player\DisconnectedFactory;
 use uhc\scenario\command\ScenariosCommand;
 use uhc\scenario\ScenarioFactory;
 use uhc\scenario\ScenarioHandler;
@@ -46,6 +53,7 @@ final class UHC extends PluginBase {
         TeamFactory::loadAll();
         WorldFactory::loadAll();
 
+        DisconnectedFactory::task();
         SessionFactory::task();
 
         $this->unregisterCommands();
@@ -54,6 +62,7 @@ final class UHC extends PluginBase {
         $this->registerLibraries();
         $this->registerHandlers();
         $this->registerCommands();
+        $this->registerEntities();
         $this->registerItems();
     }
 
@@ -118,7 +127,13 @@ final class UHC extends PluginBase {
         }
     }
 
-    public function registerItems(): void {
+    private function registerEntities(): void {
+        EntityFactory::getInstance()->register(DisconnectedMob::class, function(World $world, CompoundTag $nbt): DisconnectedMob {
+            return new DisconnectedMob(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+        }, ['DisconnectedMob', 'uhc:disconnectedmob'], EntityLegacyIds::ZOMBIE);
+    }
+
+    private function registerItems(): void {
         ItemFactory::getInstance()->register(new GoldenHead, true);
     }
 
