@@ -37,6 +37,7 @@ final class DiscordFeed {
             return '• ' . $scenario->getName() . ' - ' . $scenario->getDescription();
         }, $scenarios)));
         $embed->addField('Starting in', $waitingTime . ' ' . ($waitingTime === 1 ? 'minute' : 'minutes'));
+        $embed->addField('Server', 'na.could.club - 19132');
         $embed->setTimestamp($dateTime);
         
         $message->setContent('@everyone');
@@ -44,7 +45,7 @@ final class DiscordFeed {
         $webhook->send($message);
     }
     
-    static public function sendKillMessage(string $message): void {
+    static public function sendKillMessage(string $content): void {
         $game = UHC::getInstance()->getGame();
         
         $webhook = new Webhook(DiscordWebhook::CHANNEL_KILLS);
@@ -53,7 +54,7 @@ final class DiscordFeed {
         
         $embed->setTitle('Game Kill');
         $embed->setColor(hexdec('00ffff'));
-        $embed->addFiel('Minute ' . ((intval) $game->getGlobalTime() / 60), $message);
+        $embed->addField('Minute ' . intval($game->getGlobalTime() / 60), $content);
         $message->addEmbed($embed);
         $webhook->send($message);
     }

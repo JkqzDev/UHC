@@ -18,6 +18,7 @@ use uhc\scenario\ScenarioFactory;
 use uhc\scenario\ScenarioHandler;
 use uhc\session\SessionFactory;
 use uhc\team\command\TeamChatCommand;
+use uhc\team\command\TeamCommand;
 use uhc\team\TeamFactory;
 use uhc\world\WorldFactory;
 
@@ -101,7 +102,8 @@ final class UHC extends PluginBase {
             // Scenarios
             new ScenariosCommand,
             // Team
-            new TeamChatCommand
+            new TeamChatCommand,
+            new TeamCommand
         ];
 
         foreach ($commands as $command) {

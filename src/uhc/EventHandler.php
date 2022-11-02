@@ -181,7 +181,7 @@ final class EventHandler implements Listener {
         $message = TextFormat::colorize($message);
         
         $event->setDeathMessage($message);
-        DiscordFeed::sendKillMessage(TextFormat::clear($message));
+        DiscordFeed::sendKillMessage(TextFormat::clean($message));
     }
 
     public function handleExhaust(PlayerExhaustEvent $event): void {
