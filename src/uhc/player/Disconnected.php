@@ -19,7 +19,7 @@ final class Disconnected {
         private Session $session,
         private int $expiration,
         private float $health,
-        private array $armorInentory,
+        private array $armorInventory,
         private array $inventory,
         private Location $location,
         private ?DisconnectedMob $disconnectedMob = null
