@@ -12,6 +12,8 @@ use pocketmine\world\format\Chunk;
 use pocketmine\world\Position;
 use pocketmine\world\World;
 use uhc\game\GameStatus;
+use uhc\session\data\DeviceData;
+use uhc\session\data\KitData;
 use uhc\session\Session;
 use uhc\UHC;
 
@@ -47,6 +49,12 @@ final class Team {
     public function getOnlineMembers(): array {
         return array_filter($this->members, function (Session $session): bool {
             return $session->getPlayer() !== null;
+        });
+    }
+
+    public function getKeyboardMembers(): array {
+        return array_filter($this->members, function (Session $session): bool {
+            return $session->getInputId() === DeviceData::KEYBOARD;
         });
     }
 
@@ -130,6 +138,8 @@ final class Team {
                 if ($game->getStatus() !== GameStatus::RUNNING) {
                     $player->setImmobile();
                 }
+                KitData::default($player);
+                
                 $member->setSpectator(false);
                 $member->setScattered(true);
             }

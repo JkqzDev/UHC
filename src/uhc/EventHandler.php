@@ -19,12 +19,18 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
+use pocketmine\network\mcpe\protocol\ActorEventPacket;
+use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
+use pocketmine\network\mcpe\protocol\types\ActorEvent;
+use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use uhc\discord\DiscordFeed;
 use uhc\game\GameStatus;
+use uhc\session\data\KitData;
 use uhc\session\Session;
 use uhc\session\SessionFactory;
 
@@ -156,6 +162,8 @@ final class EventHandler implements Listener {
         $game = UHC::getInstance()->getGame();
 
         if ($session === null || $game->getStatus() !== GameStatus::RUNNING) {
+            $event->setDrops([]);
+            $event->setDeathMessage('');
             return;
         }
         $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 
@@ -173,6 +181,7 @@ final class EventHandler implements Listener {
         }
         $session->setSpectator(true);
         $player->setSpawn($player->getPosition()->add(0, 3, 0));
+        KitData::spectator($player);
 
         $game->getInventoryCache()->addInventory($player->getXuid(), $player->getArmorInventory()->getContents(), $player->getInventory()->getContents());
         $game->getPositionCache()->addPosition($player->getXuid(), $player->getPosition());
@@ -236,5 +245,21 @@ final class EventHandler implements Listener {
         $session?->quit();
 
         $event->setQuitMessage(TextFormat::colorize('&7[&c-&7] &c' . $player->getName()));
+    }
+
+    public function handlePacketSend(DataPacketSendEvent $event): void {
+        $packets = $event->getPackets();
+
+        foreach ($packets as $packet) {
+            if ($packet instanceof LevelSoundEventPacket) {
+                if ($packet->sound === LevelSoundEvent::ATTACK_STRONG || $packet->sound === LevelSoundEvent::ATTACK_NODAMAGE) {
+                    $event->cancel();
+                }
+            } elseif ($packet instanceof ActorEventPacket) {
+                if ($packet->eventId === ActorEvent::ARM_SWING) {
+                    $event->cancel();
+                }
+            }
+        }
     }
 }

@@ -13,6 +13,7 @@ use pocketmine\utils\TextFormat;
 use uhc\game\GameStatus;
 use uhc\scenario\default\CatEyes;
 use uhc\scenario\ScenarioFactory;
+use uhc\session\data\KitData;
 use uhc\session\SessionFactory;
 use uhc\team\TeamFactory;
 use uhc\UHC;
@@ -76,7 +77,9 @@ final class RespawnCommand extends Command {
             $player->getArmorInventory()->setContents(array_map(function (array $item) {
                 return Item::jsonDeserialize($item);
             }, $inventory['armorContents']));
-            $player->getInventory()->setContents(array_map(function (array $item) {}, $inventory['contents']));
+            $player->getInventory()->setContents(array_map(function (array $item) {
+                return Item::jsonDeserialize($item);
+            }, $inventory['contents']));
             $player->sendMessage(TextFormat::colorize('&aYou have received your last known items'));
         } else {
             if (!$game->getProperties()->isTeam()) {
@@ -97,8 +100,8 @@ final class RespawnCommand extends Command {
                         $session->setSpectator(false);
                         $session->clear();
 
-                        $sender->teleport($team->getPosition());
-                        // Give kit
+                        $player->teleport($team->getPosition());
+                        KitData::spectator($player);
                     }
                 }
             }

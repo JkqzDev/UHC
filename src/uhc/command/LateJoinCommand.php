@@ -11,6 +11,7 @@ use pocketmine\utils\TextFormat;
 use uhc\game\GameStatus;
 use uhc\scenario\default\CatEyes;
 use uhc\scenario\ScenarioFactory;
+use uhc\session\data\KitData;
 use uhc\session\SessionFactory;
 use uhc\team\TeamFactory;
 use uhc\UHC;
@@ -75,6 +76,7 @@ final class LateJoinCommand extends Command {
                     $session->clear();
 
                     $sender->teleport($team->getPosition());
+                    KitData::default($sender);
                 }
             }
         }

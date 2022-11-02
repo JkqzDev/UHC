@@ -9,7 +9,9 @@ use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use uhc\game\GameStatus;
+use uhc\session\data\DeviceData;
 use uhc\session\SessionFactory;
+use uhc\team\Team;
 use uhc\team\TeamFactory;
 use uhc\UHC;
 
@@ -128,6 +130,14 @@ final class TeamCommand extends Command {
                     $sender->sendMessage(TextFormat::colorize('&cTeam is full'));
                     return;
                 }
+
+                if ($target->getInputId() === DeviceData::KEYBOARD) {
+                    if (count($team->getKeyboardMembers()) === TeamFactory::getProperties()->getMaxKeyboards()) {
+                        unset($this->invites[$session->getXuid()][$args[1]]);
+                        $sender->sendMessage(TextFormat::colorize('&cYou can\'t invite any keyboard players because you\'re already at the limit'));
+                        return;
+                    }
+                }
                 
                 $this->invites[$target->getXuid()][$sender->getName()] = $team;
                 
@@ -166,6 +176,7 @@ final class TeamCommand extends Command {
                     $sender->sendMessage(TextFormat::colorize('&cYou don\'t have any invites from this player'));
                     return;
                 }
+                /** @var Team */
                 $team = $invites[$args[1]];
                 
                 if (TeamFactory::get($team->getId()) === null) {
@@ -177,6 +188,14 @@ final class TeamCommand extends Command {
                     unset($this->invites[$session->getXuid()][$args[1]]);
                     $sender->sendMessage(TextFormat::colorize('&cTeam is full'));
                     return;
+                }
+
+                if ($session->getInputId() === DeviceData::KEYBOARD) {
+                    if (count($team->getKeyboardMembers()) === TeamFactory::getProperties()->getMaxKeyboards()) {
+                        unset($this->invites[$session->getXuid()][$args[1]]);
+                        $sender->sendMessage(TextFormat::colorize('&cThe team already has the spaces occupied for keyboards'));
+                        return;
+                    }
                 }
                 unset($this->invites[$session->getXuid()]);
                 

@@ -14,8 +14,9 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\Position;
-use pocketmine\world\World;
 use uhc\game\GameStatus;
+use uhc\session\data\DeviceData;
+use uhc\session\data\KitData;
 use uhc\session\scoreboard\ScoreboardBuilder;
 use uhc\session\scoreboard\ScoreboardTrait;
 use uhc\team\Team;
@@ -30,6 +31,8 @@ final class Session {
         private string $xuid,
         private string $name,
         private int $kills = 0,
+        private int $deviceId = 0,
+        private int $inputId = 0,
         private bool $host = false,
         private bool $spectator = false,
         private bool $scattered = false,
@@ -48,6 +51,14 @@ final class Session {
 
     public function getKills(): int {
         return $this->kills;
+    }
+
+    public function getDeviceId(): int {
+        return $this->deviceId;
+    }
+
+    public function getInputId(): int {
+        return $this->inputId;
     }
     
     public function isHost(): bool {
@@ -129,15 +140,6 @@ final class Session {
             }
             $y = $world->getHighestBlockAt($x, $z);
             $position = new Position($x, $y, $z, $world);
-            /*$x = mt_rand(-$border, $border);
-            $y = World::Y_MAX;
-            $z = mt_rand(-$border, $border);
-
-            $position = new Position($x, $y, $z, $world);
-            $player->teleport($position);
-
-            $y = $world->getHighestBlockAt($x, $z);
-            $position->y = $y;*/
 
             if (in_array($world->getBlock($position->asVector3()->add(0, -1, 0))->getId(), [BlockLegacyIds::FLOWING_LAVA, BlockLegacyIds::LAVA, BlockLegacyIds::WATER, BlockLegacyIds::FLOWING_WATER])) {
                 $this->scatter();
@@ -148,7 +150,8 @@ final class Session {
                 $player->setImmobile();
             }
             $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
-
+            KitData::default($player);
+            
             $this->spectator = false;
             $this->scattered = true;
         }));
@@ -161,6 +164,9 @@ final class Session {
             return;
         }
         $game = UHC::getInstance()->getGame();
+
+        $this->deviceId = DeviceData::getOSInt($player);
+        $this->inputId = DeviceData::getInputInt($player);
 
         $this->scoreboard?->spawn();
         $pk = GameRulesChangedPacket::create([
@@ -188,7 +194,7 @@ final class Session {
                         } else {
                             if (!$this->scattered) {
                                 $player->teleport($game->getWorld()->getSpawnLocation());
-                                $player->setGamemode(GameMode::SPECTATOR());
+                                KitData::spectator($player);
 
                                 $this->spectator = true;
                                 $this->clear();
@@ -217,7 +223,7 @@ final class Session {
                 if ($this->isAlive()) {
                     if (!$this->scattered) {
                         $player->teleport($game->getWorld()->getSpawnLocation());
-                        $player->setGamemode(GameMode::SPECTATOR());
+                        KitData::spectator($player);
                         
                         $this->spectator = true;
                         $this->clear();
@@ -226,6 +232,7 @@ final class Session {
                 break;
         }
 
+        $player->setNameTag(TextFormat::colorize('&7' . $player->getName() . ' &e[' . DeviceData::getOS($player) . ']'));
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . ' &c♥'));
     }
 
