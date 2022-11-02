@@ -15,6 +15,7 @@ use pocketmine\utils\TextFormat;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\Position;
 use uhc\game\GameStatus;
+use uhc\player\DisconnectedFactory;
 use uhc\session\data\DeviceData;
 use uhc\session\data\KitData;
 use uhc\session\scoreboard\ScoreboardBuilder;
@@ -151,7 +152,7 @@ final class Session {
             }
             $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
             KitData::default($player);
-            
+
             $this->spectator = false;
             $this->scattered = true;
         }));
@@ -198,6 +199,8 @@ final class Session {
 
                                 $this->spectator = true;
                                 $this->clear();
+                            } else {
+                                DisconnectedFactory::get($this->xuid)?->join($player);
                             }
                         }
                     } else {
@@ -213,6 +216,8 @@ final class Session {
                         $player->setGamemode(GameMode::ADVENTURE());
 
                         $this->clear();
+                    } else {
+                        DisconnectedFactory::get($this->xuid)?->join($player);
                     }
                 }
                 break;
@@ -227,6 +232,8 @@ final class Session {
                         
                         $this->spectator = true;
                         $this->clear();
+                    } else {
+                        DisconnectedFactory::get($this->xuid)?->join($player);
                     }
                 }
                 break;
@@ -237,7 +244,18 @@ final class Session {
     }
 
     public function quit(): void {
-        
+        $player = $this->getPlayer();
+
+        if ($player === null) {
+            return;
+        }
+        $game = UHC::getInstance()->getGame();
+
+        if ($game->getStatus() !== GameStatus::WAITING) {
+            if ($this->isAlive() && $this->isScattered()) {
+                DisconnectedFactory::create($this, $player);
+            }
+        }
     }
 
     public function clear(): void {
