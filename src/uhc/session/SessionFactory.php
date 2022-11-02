@@ -31,6 +31,6 @@ final class SessionFactory {
             foreach (self::getAll() as $session) {
                 $session->update();
             }
-        }), 1);
+        }), 20);
     }
 }
