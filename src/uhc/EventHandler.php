@@ -23,6 +23,7 @@ use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
+use uhc\discord\DiscordFeed;
 use uhc\game\GameStatus;
 use uhc\session\Session;
 use uhc\session\SessionFactory;
@@ -164,7 +165,7 @@ final class EventHandler implements Listener {
             
             if ($data['time'] > time()) {
                 /** @var Session */
-                $damager = $this->lastHit[$player->getXuid()];
+                $damager = $data['damager'];
                 $damager->addKill();
 
                 $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &ewas slain by &c' . $damager->getName() . ' &7[&f' . $damager->getKills() . '&7]';
@@ -176,8 +177,11 @@ final class EventHandler implements Listener {
         $game->getInventoryCache()->addInventory($player->getXuid(), $player->getArmorInventory()->getContents(), $player->getInventory()->getContents());
         $game->getPositionCache()->addPosition($player->getXuid(), $player->getPosition());
         $game->checkWinner();
-
-        $event->setDeathMessage(TextFormat::colorize($message));
+        
+        $message = TextFormat::colorize($message);
+        
+        $event->setDeathMessage($message);
+        DiscordFeed::sendKillMessage(TextFormat::clear($message));
     }
 
     public function handleExhaust(PlayerExhaustEvent $event): void {

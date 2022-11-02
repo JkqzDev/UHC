@@ -4,37 +4,44 @@ declare(strict_types=1);
 
 namespace uhc\scenario\default;
 
-use pocketmine\block\BlockFactory;
-use pocketmine\block\BlockLegacyIds;
 use pocketmine\block\tile\Chest;
+use pocketmine\block\VanillaBlocks;
 use pocketmine\entity\Living;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\player\Player;
+use pocketmine\scheduler\Task;
+use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\world\Explosion;
+use pocketmine\world\particle\FloatingTextParticle;
+use pocketmine\world\Position;
 use uhc\scenario\Scenario;
+use uhc\UHC;
 
 final class TimeBomb extends Scenario {
 
     public function __construct() {
-        parent::__construct('TimeBomb', 'Upon a player\'s death, a chest will spawn with the player\'s items along with a golden head');
+        parent::__construct('TimeBomb', 'Upon a player\'s death, a chest will spawn with the player\'s items along with a golden head', 1, true);
     }
 
     private function summonChest(Living $entity): void {
+        $game = UHC::getInstance()->getGame();
         $armorContents = $entity->getArmorInventory()->getContents();
 
         if ($entity instanceof Player) {
             $inventoryContents = $entity->getInventory()->getContents();
+            $name = $entity->getName();
         }
         $items = array_merge($armorContents, $inventoryContents);
-        $block = BlockFactory::getInstance()->get(BlockLegacyIds::CHEST);
 
-        $firstPos = $entity->getPosition()->floor();
-        $secondPos = $entity->getPosition()->floor()->subtract(0, 0, ($entity->getPosition()->getZ() > 0 ? -1 : 1));
-        $entity->getWorld()->setBlock($firstPos, $block);
-        $entity->getWorld()->setBlock($secondPos, $block);
+        $firstPos = $entity->getPosition()->asVector3();
+        $secondPos = $entity->getPosition()->subtract(($entity->getPosition()->getX() > 0 ? -1 : 1), 0, 0);
+        
+        $entity->getWorld()->setBlock($firstPos, VanillaBlocks::CHEST());
+        $entity->getWorld()->setBlock($secondPos, VanillaBlocks::CHEST());
 
-        $firstTile = $entity->getWorld()->getTile($firstPos);
-        $secondTile = $entity->getWorld()->getTile($secondPos);
+        $firstTile = $game->getWorld()->getTile($firstPos);
+        $secondTile = $game->getWorld()->getTile($secondPos);
 
         if ($firstTile instanceof Chest && $secondTile instanceof Chest) {
             $firstTile->setName(TextFormat::colorize('&e' . $entity->getName() . ' Corpse'));
@@ -44,6 +51,57 @@ final class TimeBomb extends Scenario {
             $secondTile->pairWith($firstTile);
 
             $firstTile->getInventory()->setContents($items);
+            
+            UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new class($name, $entity->getPosition()) extends Task {
+                private string $name;
+                private Position $position;
+                private FloatingTextParticle $particle;
+                
+                private int $countdown = 30;
+                
+                public function __construct(string $name, Position $position) {
+                    $this->name = $name;
+                    $this->position = $position;
+                    
+                    $this->particle = new FloatingTextParticle(TextFormat::colorize('&b' . $this->countdown), TextFormat::colorize('&b' . $this->name . ' &fcorpse will explode in:'));
+                }
+                
+                private function explode(): void {
+                    $explosion = new Explosion($this->position, 5);
+                    $explosion->explodeA();
+                    $explosion->explodeB();
+                }
+    
+                private function updateParticle(): void {
+                    if ($this->particle === null) {
+                        return;
+                    }
+                    $this->particle->setText(TextFormat::colorize('&b' . $this->countdown));
+                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0, 1, 0), $this->particle);
+                }
+    
+                private function removeParticle(): void {
+                    if ($this->particle === null) {
+                        return;
+                    }
+                    $this->particle->setInvisible();
+                    $this->position->getWorld()->addParticle($this->position->asVector3()->add(0, 1, 0), $this->particle);
+                }
+    
+                public function onRun(): void {
+                    $this->countdown--;
+        
+                    if ($this->countdown <= 0) {
+                        $this->explode();
+                        $this->removeParticle();
+            
+                        Server::getInstance()->broadcastMessage(TextFormat::colorize('&7[&6Timebomb&7] &e' . $this->name . '\'s corpse has exploded!'));
+                        $this->getHandler()->cancel();
+                        return;
+                    }
+                    $this->updateParticle();
+                }
+            }, 20);
         }
     }
 

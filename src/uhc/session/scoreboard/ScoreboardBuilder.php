@@ -15,6 +15,7 @@ use uhc\session\SessionFactory;
 use uhc\session\Session;
 use uhc\scenario\ScenarioFactory;
 use uhc\scenario\Scenario;
+use uhc\team\Team;
 use uhc\team\TeamFactory;
 use uhc\UHC;
 
@@ -111,7 +112,7 @@ final class ScoreboardBuilder {
                 } else {
                     for ($i = 0; $i < 3; $i++) {
                         if (isset($scenarios[$i])) {
-                            $lines[] = ' &7•&b ' . $scenarios[$i]->getName();
+                            $lines[] = ' &b ' . $scenarios[$i]->getName();
                         }
                     }
                     
@@ -170,6 +171,33 @@ final class ScoreboardBuilder {
                     $lines[] = ' &r&r';
                     $lines[] = ' &fSpectators: &b' . count($spectators);
                     $lines[] = ' &fTPS: &b' . $player->getServer()->getTicksPerSecond() . ' (' . $player->getServer()->getTickUsage() . ')';
+                }
+                break;
+                
+            case GameStatus::RESTARTING:
+                $lines[] = ' &fTime elapsed: &b' . gmdate('H:i:s', $game->getGlobalTime());
+                $lines[] = ' &r&r&r';
+                
+                if (!$game->getProperties()->isTeam()) {
+                    $players = array_filter(SessionFactory::getAll(), function (Session $player): bool {
+                        return $player->isAlive() && $player->isScattered();
+                    });
+                    
+                    if (count($players) === 1) {
+                        $player = array_values($players)[0];
+                        $lines[] = ' &fWinner: &b' . $player->getName();
+                        $lines[] = ' &fKills: &b' . $player->getKills();
+                    }
+                } else {
+                    $teams = array_filter(TeamFactory::getAll(), function (Team $team): bool {
+                        return $team->isAlive() && $team->isScattered();
+                    });
+
+                    if (count($teams) === 1) {
+                        $team = array_values($teams)[0];
+                        $lines[] = ' &fTeam winner: &bTeam #' . $team->getId();
+                        $lines[] = ' &fTeam kills: &b' . $team->getKills();
+                    }
                 }
                 break;
         }

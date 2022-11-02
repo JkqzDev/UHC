@@ -21,7 +21,7 @@ final class ScenarioHandler implements Listener {
     public function handleBreak(BlockBreakEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -30,7 +30,7 @@ final class ScenarioHandler implements Listener {
     public function handleDamage(EntityDamageEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -39,7 +39,7 @@ final class ScenarioHandler implements Listener {
     public function handleEntityDeath(EntityDeathEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -48,7 +48,7 @@ final class ScenarioHandler implements Listener {
     public function handleItem(CraftItemEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -57,7 +57,7 @@ final class ScenarioHandler implements Listener {
     public function handleDeath(PlayerDeathEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -66,7 +66,7 @@ final class ScenarioHandler implements Listener {
     public function handleItemUse(PlayerItemUseEvent $event): void {
         $plugin = UHC::getInstance();
         
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -75,7 +75,7 @@ final class ScenarioHandler implements Listener {
     public function handleStart(GameStartEvent $event): void {
         $plugin = UHC::getInstance();
 
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
@@ -84,7 +84,7 @@ final class ScenarioHandler implements Listener {
     public function handleStop(GameStopEvent $event): void {
         $plugin = UHC::getInstance();
 
-        if ($plugin->getGame()->getStatus() !== GameStatus::STARTING) {
+        if ($plugin->getGame()->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         ScenarioFactory::callEvent(__FUNCTION__, $event);

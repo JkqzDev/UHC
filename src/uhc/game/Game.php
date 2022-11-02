@@ -8,6 +8,7 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
+use uhc\discord\DiscordFeed;
 use uhc\event\GameStartEvent;
 use uhc\event\GameStopEvent;
 use uhc\game\border\BorderHandler;
@@ -142,11 +143,13 @@ final class Game {
                 return $team->isAlive() && $team->isScattered();
             });
 
-            if (count($teams) === 0) {
+            if (count($teams) === 1) {
                 /** @var Team */
                 $team = array_values($teams)[0];
 
                 Server::getInstance()->broadcastMessage(TextFormat::colorize('&aTeam #' . $team->getId() . ' has won the game!'));
+                DiscordFeed::sendWinMessage();
+                
                 $this->stopGame();
             }
             return;
@@ -160,6 +163,8 @@ final class Game {
             $player = array_values($players)[0];
 
             Server::getInstance()->broadcastMessage(TextFormat::colorize($player->getName() . ' has won the game!'));
+            DiscordFeed::sendWinMessage();
+            
             $this->stopGame();
         }
     }
@@ -197,6 +202,8 @@ final class Game {
     public function running(): void {
         switch ($this->status) {
             case GameStatus::STARTING:
+                $this->startingTime--;
+                
                 if ($this->startingTime <= 0) {
                     $this->startGame();
 
@@ -207,10 +214,10 @@ final class Game {
                     }
                     return;
                 }
-                $this->startingTime--;
                 break;
             
             case GameStatus::RUNNING:
+                $this->globalTime++;
                 if ($this->finalhealTime === $this->globalTime) {
                     foreach (Server::getInstance()->getOnlinePlayers() as $player) {
                         $player->setHealth($player->getMaxHealth());
@@ -225,7 +232,6 @@ final class Game {
                 if ($this->graceTime === $this->globalTime) {
                     Server::getInstance()->broadcastMessage(TextFormat::colorize('&eThe grace period has ended. Good luck!'));
                 }
-                $this->globalTime++;
                 break;
         }
     }

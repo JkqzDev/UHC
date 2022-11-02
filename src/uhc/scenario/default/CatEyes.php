@@ -8,6 +8,7 @@ use pocketmine\entity\effect\EffectInstance;
 use pocketmine\entity\effect\VanillaEffects;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use pocketmine\utils\Limits;
 use uhc\event\GameStartEvent;
 use uhc\scenario\Scenario;
 
@@ -20,7 +21,7 @@ final class CatEyes extends Scenario {
     public function addEffect(Player $player): void
     {
         $effects = $player->getEffects();
-        $effects->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), PHP_INT_MAX));
+        $effects->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), Limits::INT32_MAX));
     }
 
     public function handleStart(GameStartEvent $event): void {
