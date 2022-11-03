@@ -63,6 +63,10 @@ final class Disconnected {
         return $this->location;
     }
 
+    public function getDisconnectedMob(): ?DisconnectedMob {
+        return $this->disconnectedMob;
+    }
+
     public function join(Player $player): void {
         $mob = $this->disconnectedMob;
 

@@ -36,16 +36,16 @@ final class TellCommand extends Command {
         }
         $message = implode(' ', $args);
         
-        $sender->sendMessage(TextFormat::colorize('&eTo ' . $player->getDisplayName() . ': &f' . $message));
+        $sender->sendMessage(TextFormat::colorize('&fTo &e' . $player->getDisplayName() . '&7: ' . $message));
         $name = $sender instanceof Player ? $sender->getDisplayName() : $sender->getName();
-        $player->sendMessage(TextFormat::colorize('&eFrom ' . $name . ': &f' . $message));
+        $player->sendMessage(TextFormat::colorize('&7From &e' . $name . '&7: ' . $message));
 
         $sessions = array_filter(SessionFactory::getAll(), function (Session $s) use ($sender, $player): bool {
             return $s->isOnline() && $s->getPlayer() !== $sender && $s->getPlayer() !== $player;
         });
         
         foreach ($sessions as $session) {
-            $session->getPlayer()?->sendMessage(TextFormat::colorize('&7' . $name . ' to ' . $player->getDisplayName() . ': &f' . $message));
+            $session->getPlayer()?->sendMessage(TextFormat::colorize('&e' . $name . ' &7to &e' . $player->getDisplayName() . '&7: ' . $message));
         }
     }
 }

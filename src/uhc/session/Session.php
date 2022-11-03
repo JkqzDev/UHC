@@ -239,7 +239,7 @@ final class Session {
                 break;
         }
 
-        $player->setNameTag(TextFormat::colorize('&7' . $player->getName() . ' &e[' . DeviceData::getOS($player) . ']'));
+        $player->setNameTag(TextFormat::colorize('&7' . $player->getName() . ' &b[' . DeviceData::getOS($player) . ']'));
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . ' &c♥'));
     }
 

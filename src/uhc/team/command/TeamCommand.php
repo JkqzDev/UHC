@@ -78,7 +78,7 @@ final class TeamCommand extends Command {
                 TeamFactory::create($session);
                 $team = $session->getTeam();
                 
-                $sender->getServer()->broadcastMessage(TextFormat::colorize('&8» &e' . $sender->getName() . ' has created Team #' . $team->getId()));
+                $sender->getServer()->broadcastMessage(TextFormat::colorize('&6' . $sender->getName() . ' has created Team #' . $team->getId()));
                 $sender->sendMessage(TextFormat::colorize('&eYou have created your team. Now invite the players'));
                 break;
                 
@@ -249,8 +249,8 @@ final class TeamCommand extends Command {
                 }
                 $team = $session->getTeam();
                 
-                if ($team->isOwner($session)) {
-                    $sender->sendMessage(TextFormat::colorize('&cYou can\'t leave the team, you must disband'));
+                if (!$team->isOwner($session)) {
+                    $sender->sendMessage(TextFormat::colorize('&cYou don\'t have permission for disband'));
                     return;
                 }
                 $team->disband();
