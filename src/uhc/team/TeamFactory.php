@@ -24,7 +24,7 @@ final class TeamFactory {
     }
 
     static public function create(Session $owner): void {
-        $id = 0;
+        $id = 1;
 
         while (self::get($id) !== null) {
             $id++;

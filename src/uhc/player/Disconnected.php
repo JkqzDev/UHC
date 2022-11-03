@@ -37,7 +37,7 @@ final class Disconnected {
         $mob->setNameTagAlwaysVisible();
 
         $mob->setNameTag(TextFormat::colorize('&r' . $this->session->getName() . ' &e[AFK]'));
-        $mob->getArmorInventory()->setContents($this->armorInentory);
+        $mob->getArmorInventory()->setContents($this->armorInventory);
         $mob->spawnToAll();
 
         $this->disconnectedMob = $mob;

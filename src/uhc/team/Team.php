@@ -48,7 +48,7 @@ final class Team {
 
     public function getOnlineMembers(): array {
         return array_filter($this->members, function (Session $session): bool {
-            return $session->getPlayer() !== null;
+            return $session->isOnline();
         });
     }
 
@@ -72,7 +72,7 @@ final class Team {
 
     public function isAlive(): bool {
         $members = array_filter($this->members, function (Session $session): bool {
-            return $session->isAlive() && $session->isScattered();
+            return $session->isAlive();
         });
 
         return count($members) > 0;
