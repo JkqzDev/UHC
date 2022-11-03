@@ -261,6 +261,10 @@ final class Session {
     public function clear(): void {
         $player = $this->getPlayer();
 
+        if ($player === null) {
+            return;
+        }
+
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();

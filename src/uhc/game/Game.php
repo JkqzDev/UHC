@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace uhc\game;
 
+use pocketmine\player\GameMode;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
+use staffmode\session\SessionFactory as SessionSessionFactory;
 use uhc\discord\DiscordFeed;
 use uhc\event\GameStartEvent;
 use uhc\event\GameStopEvent;
@@ -180,6 +182,19 @@ final class Game {
             foreach ($sessions as $session) {
                 TeamFactory::create($session);
             }
+        }
+        /** @var Session[] */
+        $hosts = array_filter(SessionFactory::getAll(), function (Session $session): bool {
+            return $session->isOnline() && $session->isHost();
+        });
+
+        foreach ($hosts as $host) {
+            $host->clear();
+            $host->getPlayer()?->setGamemode(GameMode::CREATIVE());
+            $host->getPlayer()?->teleport($this->world->getSpawnLocation());
+
+            $staffModeSession = SessionSessionFactory::get($host->getPlayer());
+            $staffModeSession?->giveItems($host->getPlayer());
         }
         $this->properties->setGlobalMute(true);
         UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ScatteringTask, 15);

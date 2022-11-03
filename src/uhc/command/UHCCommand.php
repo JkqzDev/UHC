@@ -6,9 +6,11 @@ namespace uhc\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\player\GameMode;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
+use staffmode\session\SessionFactory as SessionSessionFactory;
 use uhc\game\GameStatus;
 use uhc\menu\SetupMenu;
 use uhc\session\SessionFactory;
@@ -116,6 +118,15 @@ final class UHCCommand extends Command {
 
                     $player->sendMessage(TextFormat::colorize('&aYou were added as another host of the game'));
                     $sender->sendMessage(TextFormat::colorize('&aYou added player ' . $player->getName() . ' as another host of the game'));
+
+                    if ($game->getStatus() !== GameStatus::WAITING) {
+                        $target->clear();
+                        $player->setGamemode(GameMode::CREATIVE());
+                        $player->teleport($game->getWorld()->getSpawnLocation());
+
+                        $staffModeSession = SessionSessionFactory::get($player);
+                        $staffModeSession?->giveItems($player);
+                    }
                     return;
                 }
                 $target->setHost(false);
