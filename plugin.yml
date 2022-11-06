@@ -1,6 +1,7 @@
 name: UHC
 version: 1.0
-author: JuqnGOOD
+author: Blessed
+softdepend: StaffMode
 main: uhc\UHC
 api: 4.0.0
 permissions:
