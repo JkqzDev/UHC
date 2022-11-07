@@ -58,8 +58,9 @@ final class TimeBomb extends Scenario {
             $secondTile->pairWith($firstTile);
 
             $firstTile->getInventory()->setContents($items);
+            $position = $entity->getPosition();
             
-            UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new class($name, $entity->getPosition()) extends Task {
+            UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new class($name, $position) extends Task {
                 private string $name;
                 private Position $position;
                 private FloatingTextParticle $particle;

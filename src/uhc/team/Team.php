@@ -133,13 +133,12 @@ final class Team {
 
             foreach ($members as $member) {
                 $player = $member->getPlayer();
+                KitData::default($player);
                 $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
 
                 if ($game->getStatus() !== GameStatus::RUNNING) {
                     $player->setImmobile();
                 }
-                KitData::default($player);
-                
                 $member->setSpectator(false);
                 $member->setScattered(true);
             }

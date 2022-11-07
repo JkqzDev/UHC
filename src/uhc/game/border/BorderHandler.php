@@ -203,7 +203,6 @@ final class BorderHandler {
         
         if (!$this->canShrink()) {
             $this->createArena($this->size + 1);
-            Server::getInstance()->broadcastMessage(TextFormat::colorize('&d[+] Final Arena'));
         }
         $this->createBorder();
         Server::getInstance()->broadcastMessage(TextFormat::colorize('&3[+] &bThe border has been shrank to ' . $this->getSize() . 'x' . $this->getSize()));

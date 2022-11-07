@@ -96,7 +96,7 @@ final class Disconnected {
 
             $session->setSpectator(true);
 
-            $game->getInventoryCache()->addInventory($session->getXuid(), $this->armorInentory, $this->inventory);
+            $game->getInventoryCache()->addInventory($session->getXuid(), $this->armorInventory, $this->inventory);
             $game->getPositionCache()->addPosition($session->getXuid(), $position);
             $game->checkWinner();
 

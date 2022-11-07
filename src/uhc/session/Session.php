@@ -150,8 +150,8 @@ final class Session {
             if ($game->getStatus() !== GameStatus::RUNNING) {
                 $player->setImmobile();
             }
-            $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
             KitData::default($player);
+            $player->teleport(Position::fromObject($position->add(0, 1, 0), $world));
 
             $this->spectator = false;
             $this->scattered = true;
@@ -238,7 +238,6 @@ final class Session {
                 }
                 break;
         }
-
         $player->setNameTag(TextFormat::colorize('&7' . $player->getName() . ' &b[' . DeviceData::getOS($player) . ']'));
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . ' &c♥'));
     }
@@ -264,7 +263,6 @@ final class Session {
         if ($player === null) {
             return;
         }
-
         $player->getInventory()->clearAll();
         $player->getArmorInventory()->clearAll();
         $player->getOffHandInventory()->clearAll();
@@ -273,6 +271,8 @@ final class Session {
 
         $player->setHealth($player->getMaxHealth());
         $player->getHungerManager()->setFood($player->getHungerManager()->getMaxFood());
+        
+        $player->getXpManager()->setXpAndProgress(0, 0.0);
 
         $player->extinguish();
     }
