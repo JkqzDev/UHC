@@ -253,7 +253,7 @@ final class Session {
         }
         $game = UHC::getInstance()->getGame();
 
-        if ($game->getStatus() !== GameStatus::WAITING) {
+        if ($game->getStatus() !== GameStatus::WAITING || $game->getStatus() !== GameStatus::RESTARTING) {
             if ($this->isAlive() && $this->isScattered()) {
                 DisconnectedFactory::create($this, $player);
             }
