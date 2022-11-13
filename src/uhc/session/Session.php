@@ -195,10 +195,10 @@ final class Session {
                         } else {
                             if (!$this->scattered) {
                                 $player->teleport($game->getWorld()->getSpawnLocation());
-                                KitData::spectator($player);
 
                                 $this->spectator = true;
                                 $this->clear();
+                                KitData::spectator($player);
                             } else {
                                 DisconnectedFactory::get($this->xuid)?->join($player);
                             }
@@ -228,13 +228,16 @@ final class Session {
                 if ($this->isAlive()) {
                     if (!$this->scattered) {
                         $player->teleport($game->getWorld()->getSpawnLocation());
-                        KitData::spectator($player);
                         
                         $this->spectator = true;
                         $this->clear();
+                        KitData::spectator($player);
                     } else {
                         DisconnectedFactory::get($this->xuid)?->join($player);
                     }
+                } elseif ($this->isSpectator() && $player->getGamemode() === GameMode::SURVIVAL()) {
+                    $this->clear();
+                    KitData::spectator($player);
                 }
                 break;
         }
