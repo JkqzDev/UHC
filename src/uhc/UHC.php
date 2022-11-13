@@ -91,8 +91,7 @@ final class UHC extends PluginBase {
             'version',
             'kill',
             'suicide',
-            'me',
-            'tell'
+            'me'
         ];
 
         foreach ($labels as $label) {
@@ -112,7 +111,7 @@ final class UHC extends PluginBase {
             new LateJoinCommand,
             new PingCommand,
             new RespawnCommand,
-            new TellCommand,
+            //new TellCommand,
             new TopKillsCommand,
             new UHCCommand,
             // Scenarios

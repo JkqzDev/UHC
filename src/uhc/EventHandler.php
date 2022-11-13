@@ -129,6 +129,7 @@ final class EventHandler implements Listener {
             ];
         }
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . '&c♥'));
+        AlertMessages::handleAlertDamage($player, $event);
     }
     
     public function handleRegainHealth(EntityRegainHealthEvent $event): void {
