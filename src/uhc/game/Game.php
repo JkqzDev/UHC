@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace uhc\game;
 
+use pocketmine\entity\Entity;
+use pocketmine\entity\object\ExperienceOrb;
+use pocketmine\entity\object\ItemEntity;
 use pocketmine\player\GameMode;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
@@ -51,6 +54,24 @@ final class Game {
             $this->running();
             $this->border->running();
         }), 20);
+
+        UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
+            $world = $this->world;
+            
+            if ($world === null) {
+                return;
+            }
+            $count = 0;
+            $entities = array_filter($world->getEntities(), function (Entity $entity): bool {
+                return ($entity instanceof ExperienceOrb || $entity instanceof ItemEntity) && $entity->ticksLived > 30 * 20;
+            });
+
+            foreach ($entities as $entity) {
+                $entity->flagForDespawn();
+                ++$count;
+            }
+            UHC::getInstance()->getLogger()->notice('[Clear] ' . $count . ' entities cleaned');
+        }), 5 * 60 * 20);
     }
 
     public function delete(): void {
