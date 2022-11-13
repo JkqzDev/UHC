@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace uhc\session\scoreboard;
 
-use COM;
 use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
