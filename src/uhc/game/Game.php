@@ -164,7 +164,7 @@ final class Game {
             /** @var Session */
             $player = array_values($players)[0];
 
-            Server::getInstance()->broadcastMessage(TextFormat::colorize($player->getName() . ' has won the game!'));
+            Server::getInstance()->broadcastMessage(TextFormat::colorize('&a' . $player->getName() . ' has won the game!'));
             DiscordFeed::sendWinMessage();
             
             $this->stopGame();
@@ -197,6 +197,7 @@ final class Game {
             $staffModeSession?->giveItems($host->getPlayer());
         }
         $this->properties->setGlobalMute(true);
+
         UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ScatteringTask, 15);
     }
     

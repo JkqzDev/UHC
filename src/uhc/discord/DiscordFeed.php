@@ -37,7 +37,7 @@ final class DiscordFeed {
             return '• ' . $scenario->getName() . ' - ' . $scenario->getDescription();
         }, $scenarios)));
         $embed->addField('Starting in', $waitingTime . ' ' . ($waitingTime === 1 ? 'minute' : 'minutes'));
-        $embed->addField('Server', 'na.could.club - 19132');
+        $embed->addField('Server', 'na.clouduhc.lol - 25600');
         $embed->setTimestamp($dateTime);
         
         $message->setContent('@everyone');

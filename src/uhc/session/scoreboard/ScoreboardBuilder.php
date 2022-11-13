@@ -148,7 +148,7 @@ final class ScoreboardBuilder {
 
             case GameStatus::RUNNING:
                 $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
-                    return $target->isAlive();
+                    return $target->isScattered() && $target->isAlive();
                 });
                 $totalPlayers = array_filter(SessionFactory::getAll(), function (Session $target): bool {
                     return $target->isScattered() && !$target->isHost();
