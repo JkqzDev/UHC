@@ -73,20 +73,10 @@ final class ScenarioHandler implements Listener {
     }
 
     public function handleStart(GameStartEvent $event): void {
-        $plugin = UHC::getInstance();
-
-        if ($plugin->getGame()->getStatus() < GameStatus::RUNNING) {
-            return;
-        }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
     }
 
     public function handleStop(GameStopEvent $event): void {
-        $plugin = UHC::getInstance();
-
-        if ($plugin->getGame()->getStatus() < GameStatus::RUNNING) {
-            return;
-        }
         ScenarioFactory::callEvent(__FUNCTION__, $event);
     }
 }

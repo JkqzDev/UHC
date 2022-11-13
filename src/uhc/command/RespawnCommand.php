@@ -110,7 +110,7 @@ final class RespawnCommand extends Command {
         }
 
         if ($game->getStatus() === GameStatus::RUNNING) {
-            $catEyes = ScenarioFactory::get('CatEyes');
+            $catEyes = ScenarioFactory::get('Cat Eyes');
 
             if ($catEyes instanceof CatEyes && $catEyes->isEnabled()) {
                 $catEyes->addEffect($player);

@@ -14,7 +14,6 @@ final class NoFall extends Scenario {
     }
     
     public function handleDamage(EntityDamageEvent $event): void {
-        $player = $event->getEntity();
         $cause = $event->getCause();
         
         if (!$event->isCancelled()) {

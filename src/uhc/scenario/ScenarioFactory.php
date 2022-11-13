@@ -30,6 +30,7 @@ final class ScenarioFactory {
     
     static public function create(Scenario $scenario): void {
         self::$scenarios[$scenario->getName()] = $scenario;
+        self::sort();
     }
     
     static public function callEvent(string $method, Event $event): void {
