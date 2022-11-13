@@ -19,13 +19,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
-use pocketmine\network\mcpe\protocol\ActorEventPacket;
-use pocketmine\network\mcpe\protocol\LevelSoundEventPacket;
-use pocketmine\network\mcpe\protocol\types\ActorEvent;
-use pocketmine\network\mcpe\protocol\types\LevelSoundEvent;
 use pocketmine\player\Player;
 use pocketmine\utils\TextFormat;
 use staffmode\alert\AlertMessages;
@@ -247,21 +242,5 @@ final class EventHandler implements Listener {
         $session?->quit();
 
         $event->setQuitMessage(TextFormat::colorize('&7[&c-&7] &c' . $player->getName()));
-    }
-
-    public function handlePacketSend(DataPacketSendEvent $event): void {
-        $packets = $event->getPackets();
-
-        foreach ($packets as $packet) {
-            if ($packet instanceof LevelSoundEventPacket) {
-                if ($packet->sound === LevelSoundEvent::ATTACK_STRONG || $packet->sound === LevelSoundEvent::ATTACK_NODAMAGE) {
-                    $event->cancel();
-                }
-            } elseif ($packet instanceof ActorEventPacket) {
-                if ($packet->eventId === ActorEvent::ARM_SWING) {
-                    $event->cancel();
-                }
-            }
-        }
     }
 }
