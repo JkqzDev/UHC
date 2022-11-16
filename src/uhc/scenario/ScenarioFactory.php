@@ -55,7 +55,8 @@ final class ScenarioFactory {
     }
     
     static private function sort(): void {
-        uasort(self::getAll(), function (Scenario $firstScenario, Scenario $secondScenario) {
+        $scenarios = self::getAll();
+        uasort($scenarios, function (Scenario $firstScenario, Scenario $secondScenario) {
             return $firstScenario->getPriority() <=> $secondScenario->getPriority();
         });
     }
