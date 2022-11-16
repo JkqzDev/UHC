@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+namespace juqn\twitter\method;
+
+use juqn\twitter\data\Consumer;
+use juqn\twitter\data\Token;
+use juqn\twitter\request\Request;
+use juqn\twitter\Util;
+
+class SignatureMethod_PLAINTEXT extends SignatureMethod {
+    
+	public function get_name(): string {
+		return 'PLAINTEXT';
+	}
+
+	/**
+	 * oauth_signature is set to the concatenated encoded values of the Consumer Secret and
+	 * Token Secret, separated by a '&' character (ASCII code 38), even if either secret is
+	 * empty. The result MUST be encoded again.
+	 *   - Chapter 9.4.1 ("Generating Signatures")
+	 *
+	 * Please note that the second encoding MUST NOT happen in the SignatureMethod, as
+	 * OAuthRequest handles this!
+	 */
+	public function build_signature(Request $request, Consumer $consumer, ?Token $token): string {
+		$key_parts = [
+			$consumer->secret,
+			$token ? $token->secret : '',
+		];
+
+		$key_parts = Util::urlencode_rfc3986($key_parts);
+		$key = implode('&', $key_parts);
+		$request->base_string = $key;
+
+		return $key;
+	}
+}

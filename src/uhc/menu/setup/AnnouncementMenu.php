@@ -14,6 +14,7 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 use uhc\discord\DiscordFeed;
 use uhc\menu\SetupMenu;
+use uhc\twitter\TwitterFeed;
 use uhc\UHC;
 
 final class AnnouncementMenu {
@@ -46,6 +47,7 @@ final class AnnouncementMenu {
             
             if ($custom_name === 'Announce') {
                 DiscordFeed::sendAnnounceMessage($this->waiting_time / 60);
+                TwitterFeed::sendAnnounceMessage($this->waiting_time / 60);
                 // Announce message
                 return $transaction->discard();
             }

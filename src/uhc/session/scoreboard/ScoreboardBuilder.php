@@ -201,6 +201,7 @@ final class ScoreboardBuilder {
                 break;
         }
         $lines[] = '&7&r';
+        $lines[] = ' &bdsc.gg/clouduhc';
         $this->clear();
 
         foreach ($lines as $line) {

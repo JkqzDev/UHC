@@ -24,6 +24,7 @@ use uhc\session\Session;
 use uhc\session\SessionFactory;
 use uhc\team\Team;
 use uhc\team\TeamFactory;
+use uhc\twitter\TwitterFeed;
 use uhc\UHC;
 use uhc\world\async\WorldDeleteAsync;
 
@@ -172,6 +173,7 @@ final class Game {
 
                 Server::getInstance()->broadcastMessage(TextFormat::colorize('&aTeam #' . $team->getId() . ' has won the game!'));
                 DiscordFeed::sendWinMessage();
+                TwitterFeed::sendWinMessage();
                 
                 $this->stopGame();
             }
@@ -187,6 +189,7 @@ final class Game {
 
             Server::getInstance()->broadcastMessage(TextFormat::colorize('&a' . $player->getName() . ' has won the game!'));
             DiscordFeed::sendWinMessage();
+            TwitterFeed::sendWinMessage();
             
             $this->stopGame();
         }

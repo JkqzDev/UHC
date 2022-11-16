@@ -42,13 +42,11 @@ final class UHC extends PluginBase {
         return self::$instance;
     }
 
-    protected function onLoad(): void
-    {
+    protected function onLoad(): void {
         self::$instance = $this;    
     }
 
-    protected function onEnable(): void
-    {
+    protected function onEnable(): void {
         ScenarioFactory::loadAll();
         TeamFactory::loadAll();
         WorldFactory::loadAll();
