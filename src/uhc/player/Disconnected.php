@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc\player;
 
+use Exception;
 use pocketmine\entity\Location;
 use pocketmine\player\Player;
 use pocketmine\Server;
@@ -63,10 +64,6 @@ final class Disconnected {
         return $this->location;
     }
 
-    public function getDisconnectedMob(): ?DisconnectedMob {
-        return $this->disconnectedMob;
-    }
-
     public function join(Player $player): void {
         $mob = $this->disconnectedMob;
 
@@ -81,6 +78,9 @@ final class Disconnected {
         DisconnectedFactory::remove($this->session->getXuid());
     }
 
+    /**
+     * @throws Exception
+     */
     public function check(): void {
         $game = UHC::getInstance()->getGame();
 

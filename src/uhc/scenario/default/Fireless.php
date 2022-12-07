@@ -10,7 +10,7 @@ use uhc\scenario\Scenario;
 final class Fireless extends Scenario {
     
     public function __construct() {
-        parent::__construct('Fireless', 'All types of fire damage are nullified', self::PRIORITY_LOW);
+        parent::__construct('Fire Less', 'All types of fire damage are nullified', self::PRIORITY_LOW);
     }
     
     public function handleDamage(EntityDamageEvent $event): void {

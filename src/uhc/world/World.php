@@ -13,8 +13,7 @@ final class World {
 
     public function __construct(
         private string $name
-    ) {
-    }
+    ) {}
 
     public function copy(string $newName, string $newDirectory, ?Closure $callback = null): void {
         Server::getInstance()->getAsyncPool()->submitTask(new WorldCopyAsync(

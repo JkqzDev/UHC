@@ -10,7 +10,6 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
 use pocketmine\world\format\Chunk;
 use pocketmine\world\Position;
-use pocketmine\world\World;
 use uhc\game\GameStatus;
 use uhc\session\data\DeviceData;
 use uhc\session\data\KitData;
@@ -62,10 +61,6 @@ final class Team {
         return $session->getXuid() === $this->owner->getXuid();
     }
 
-    public function isMember(Session $session): bool {
-        return isset($this->members[spl_object_hash($session)]);
-    }
-
     public function isScattered(): bool {
         return $this->scattered;
     }
@@ -112,7 +107,7 @@ final class Team {
         if ($world === null) {
             return;
         }
-        UHC::getInstance()->getScheduler()->scheduleTask(new ClosureTask(function () use ($game, $border, $world): void {
+        UHC::getInstance()->getScheduler()->scheduleTask(task: new ClosureTask(closure: function () use ($game, $border, $world): void {
             $x = mt_rand(-$border, $border);
             $z = mt_rand(-$border, $border);
 

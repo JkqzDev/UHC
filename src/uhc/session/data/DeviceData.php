@@ -29,7 +29,7 @@ final class DeviceData {
     public const CONTROLLER = 3;
     public const MOTION_CONTROLLER = 4;
     
-    static private array $deviceOSVals = [
+    static private array $deviceOSVVars = [
         self::ANDROID => 'Android',
         self::IOS => 'iOS',
         self::OSX => 'OSX',
@@ -55,12 +55,7 @@ final class DeviceData {
     
     static public function getOS(Player $player): string {
         $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();   
-        return self::$deviceOSVals[$extraData['DeviceOS']] ?? 'Unknown';
-    }
-    
-    static public function getInput(Player $player): string {
-        $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();
-        return self::$inputVals[$extraData['CurrentInputMode']] ?? 'Unknown';
+        return self::$deviceOSVVars[$extraData['DeviceOS']] ?? 'Unknown';
     }
     
     static public function getOSInt(Player $player): int {

@@ -24,7 +24,7 @@ use uhc\UHC;
 final class TimeBomb extends Scenario {
 
     public function __construct() {
-        parent::__construct('TimeBomb', 'Upon a player\'s death, a chest will spawn with the player\'s items along with a golden head', 1, true);
+        parent::__construct('Time Bomb', 'Upon a player\'s death, a chest will spawn with the player\'s items along with a golden head', 1, true);
     }
 
     private function summonChest(Living $entity): void {
@@ -37,6 +37,8 @@ final class TimeBomb extends Scenario {
         } elseif ($entity instanceof DisconnectedMob) {
             $inventoryContents = $entity->getDisconnected()->getInventory();
             $name = $entity->getDisconnected()->getSession()->getName();
+        } else {
+            return;
         }
         $items = array_merge($armorContents, $inventoryContents);
         $items[] = GoldenHead::create();
@@ -81,17 +83,11 @@ final class TimeBomb extends Scenario {
                 }
     
                 private function updateParticle(): void {
-                    if ($this->particle === null) {
-                        return;
-                    }
                     $this->particle->setText(TextFormat::colorize('&b' . $this->countdown));
                     $this->position->getWorld()->addParticle($this->position->asVector3()->add(0.5, 1, 0.5), $this->particle);
                 }
     
                 private function removeParticle(): void {
-                    if ($this->particle === null) {
-                        return;
-                    }
                     $this->particle->setInvisible();
                     $this->position->getWorld()->addParticle($this->position->asVector3()->add(0.5, 1, 0.5), $this->particle);
                 }
@@ -103,7 +99,7 @@ final class TimeBomb extends Scenario {
                         $this->explode();
                         $this->removeParticle();
             
-                        Server::getInstance()->broadcastMessage(TextFormat::colorize('&7[&6Timebomb&7] &e' . $this->name . '\'s corpse has exploded!'));
+                        Server::getInstance()->broadcastMessage(TextFormat::colorize('&7[&6Time bomb&7] &e' . $this->name . '\'s corpse has exploded!'));
                         $this->getHandler()->cancel();
                         return;
                     }

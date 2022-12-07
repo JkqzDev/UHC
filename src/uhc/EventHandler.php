@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc;
 
+use Exception;
 use pocketmine\block\BlockLegacyIds;
 use pocketmine\entity\Living;
 use pocketmine\event\block\BlockBreakEvent;
@@ -26,16 +27,19 @@ use pocketmine\utils\TextFormat;
 use staffmode\alert\AlertMessages;
 use uhc\discord\DiscordFeed;
 use uhc\game\GameStatus;
+use uhc\scenario\default\DoNotDisturb;
+use uhc\scenario\ScenarioFactory;
 use uhc\session\data\KitData;
 use uhc\session\Session;
 use uhc\session\SessionFactory;
 
 final class EventHandler implements Listener {
 
-    private array $lastHit = [];
+    public function __construct(
+        private array $lastHit = []
+    ) {}
     
-    public function handleBreak(BlockBreakEvent $event): void
-    {
+    public function handleBreak(BlockBreakEvent $event): void {
         $block = $event->getBlock();
         $item = $event->getItem();
         $player = $event->getPlayer();
@@ -149,10 +153,12 @@ final class EventHandler implements Listener {
 
         if ($game->getProperties()->isGlobalMute() && !$player->hasPermission('globalmute.bypass')) {
             $event->cancel();
-            return;
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function handleDeath(PlayerDeathEvent $event): void {
         $player = $event->getPlayer();
         $session = SessionFactory::get($player);
@@ -163,6 +169,7 @@ final class EventHandler implements Listener {
             $event->setDeathMessage('');
             return;
         }
+        $doNotDisturb = ScenarioFactory::get('Do Not Disturb');
         $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 
 
         if (isset($this->lastHit[$player->getXuid()])) {
@@ -173,8 +180,15 @@ final class EventHandler implements Listener {
                 $damager = $data['damager'];
                 $damager->addKill();
 
+                if ($doNotDisturb instanceof DoNotDisturb) {
+                    $doNotDisturb->removePlayer($damager->getXuid());
+                }
                 $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &ewas slain by &c' . $damager->getName() . ' &7[&f' . $damager->getKills() . '&7]';
             }
+        }
+
+        if ($doNotDisturb instanceof DoNotDisturb) {
+            $doNotDisturb->removePlayer($session->getXuid());
         }
         $session->setSpectator(true);
         $player->setSpawn($player->getPosition()->add(0, 3, 0));

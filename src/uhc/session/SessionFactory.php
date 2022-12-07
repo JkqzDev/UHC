@@ -17,9 +17,9 @@ final class SessionFactory {
     }
 
     static public function get(Player|string $player): ?Session {
-        $xuid = $player instanceof Player ? $player->getXuid() : $player;
+        $guid = $player instanceof Player ? $player->getXuid() : $player;
 
-        return self::$sessions[$xuid] ?? null;
+        return self::$sessions[$guid] ?? null;
     }
 
     static public function create(Player $player): void {

@@ -107,7 +107,7 @@ final class DisconnectedMob extends Zombie {
         $session = $disconnected->getSession();
         $game = UHC::getInstance()->getGame();
 
-        if ($session === null || $game->getStatus() !== GameStatus::RUNNING) {
+        if ($game->getStatus() !== GameStatus::RUNNING) {
             return;
         }
         $message = '&c(AFK) ' . $session->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 

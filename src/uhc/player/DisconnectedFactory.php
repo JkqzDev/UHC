@@ -18,19 +18,19 @@ final class DisconnectedFactory {
         return self::$disconnected;
     }
 
-    static public function get(string $xuid): ?Disconnected {
-        return self::$disconnected[$xuid] ?? null;
+    static public function get(string $guid): ?Disconnected {
+        return self::$disconnected[$guid] ?? null;
     }
 
     static public function create(Session $session, Player $player): void {
         self::$disconnected[$player->getXuid()] = new Disconnected($session, time() + self::EXPIRATION_TIME, $player->getHealth(), $player->getArmorInventory()->getContents(), $player->getInventory()->getContents(), $player->getLocation());
     }
 
-    static public function remove(string $xuid): void {
-        if (self::get($xuid) === null) {
+    static public function remove(string $guid): void {
+        if (self::get($guid) === null) {
             return;
         }
-        unset(self::$disconnected[$xuid]);
+        unset(self::$disconnected[$guid]);
     }
 
     static public function task(): void {

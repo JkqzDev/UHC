@@ -18,8 +18,7 @@ final class BorderFiller
     private int $minX, $minZ;
     private int $maxX, $maxZ;
     private bool $error = false;
-    private int $lastHash;
-    
+
     public function __construct(ChunkManager $world) {
         $this->chunkExplorer = new SubChunkExplorer($world);
     }
@@ -66,15 +65,7 @@ final class BorderFiller
         $this->minZ = $minZ;
         $this->maxZ = $maxZ;
     }
-	
-    public function getBlockIdAt(int $x, int $y, int $z, ?int &$id = null): void {
-        if (!$this->moveTo($x, $y, $z)) {
-            return;
-        }
-        $this->lastHash = $this->getChunkExplorer()->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-        $id = $this->lastHash >> 4;
-    }
-    
+
     public function setBlockIdAt(int $x, int $y, int $z, int $id): void {
         if (!$this->moveTo($x, $y, $z)) {
             return;

@@ -54,10 +54,6 @@ final class Session {
         return $this->kills;
     }
 
-    public function getDeviceId(): int {
-        return $this->deviceId;
-    }
-
     public function getInputId(): int {
         return $this->inputId;
     }

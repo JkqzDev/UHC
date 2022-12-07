@@ -7,8 +7,8 @@ namespace uhc\menu;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
-use pocketmine\item\ItemFactory;
-use pocketmine\item\ItemIds;
+use muqsit\invmenu\type\InvMenuTypeIds;
+use pocketmine\item\VanillaItems;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
@@ -24,28 +24,28 @@ use uhc\UHC;
 final class SetupMenu {
     
     public function __construct(Player $player) {
-        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
+        $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
         
         // Heal time
-        $heal_time = ItemFactory::getInstance()->get(ItemIds::STEAK);
+        $heal_time = VanillaItems::STEAK();
         $heal_time->setCustomName(TextFormat::colorize('&r&cHeal Time'));
         // Globalmute time
-        $globalmute_time = ItemFactory::getInstance()->get(ItemIds::COMPASS);
+        $globalmute_time = VanillaItems::COMPASS();
         $globalmute_time->setCustomName(TextFormat::colorize('&r&gGlobalmute Time'));
         // Grace time
-        $grace_time = ItemFactory::getInstance()->get(ItemIds::DIAMOND_SWORD);
+        $grace_time = VanillaItems::DIAMOND_SWORD();
         $grace_time->setCustomName(TextFormat::colorize('&r&4Grace Period Time'));
         // Scenarios
-        $scenarios = ItemFactory::getInstance()->get(ItemIds::BOW);
+        $scenarios = VanillaItems::BOW();
         $scenarios->setCustomName(TextFormat::colorize('&r&eScenarios'));
         // Apple rate
-        $apple_rate = ItemFactory::getInstance()->get(ItemIds::APPLE);
+        $apple_rate = VanillaItems::APPLE();
         $apple_rate->setCustomName(TextFormat::colorize('&r&9Apple Rate'));
         // Teams
-        $teams = ItemFactory::getInstance()->get(ItemIds::DIAMOND_CHESTPLATE);
+        $teams = VanillaItems::DIAMOND_CHESTPLATE();
         $teams->setCustomName(TextFormat::colorize('&r&dTeam'));
         // Announcement
-        $announcement = ItemFactory::getInstance()->get(ItemIds::PAPER);
+        $announcement = VanillaItems::PAPER();
         $announcement->setCustomName(TextFormat::colorize('&r&9Announcement'));
         
         $menu->getInventory()->addItem(

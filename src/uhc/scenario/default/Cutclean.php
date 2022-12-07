@@ -12,7 +12,7 @@ use uhc\scenario\Scenario;
 final class Cutclean extends Scenario {
 
     public function __construct() {
-        parent::__construct('Cutclean', 'Iron and gold ore smelt automatically after mining', self::PRIORITY_LOW, true);
+        parent::__construct('Cut Clean', 'Iron and gold ore smelt automatically after mining', self::PRIORITY_LOW, true);
     }
 
     public function handleBreak(BlockBreakEvent $event): void {

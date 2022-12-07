@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace uhc\game;
 
+use Exception;
 use pocketmine\entity\Entity;
 use pocketmine\entity\object\ExperienceOrb;
 use pocketmine\entity\object\ItemEntity;
@@ -140,11 +141,7 @@ final class Game {
     public function setGlobalTime(int $time): void {
         $this->globalTime = $time;
     }
-    
-    public function setStartingTime(int $time): void {
-        $this->startingTime = $time;
-    }
-    
+
     public function setGraceTime(int $time): void {
         $this->graceTime = $time;
     }
@@ -160,7 +157,10 @@ final class Game {
     public function setWorld(World $word): void {
         $this->world = $word;
     }
-    
+
+    /**
+     * @throws Exception
+     */
     public function checkWinner(): void {
         if ($this->properties->isTeam()) {
             $teams = array_filter(TeamFactory::getAll(), function (Team $team): bool {

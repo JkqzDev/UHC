@@ -11,13 +11,13 @@ use pocketmine\entity\EntityFactory;
 use pocketmine\item\ItemFactory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\world\World;
 use uhc\command\GlobalMuteCommand;
 use uhc\command\HelpopCommand;
 use uhc\command\LateJoinCommand;
 use uhc\command\PingCommand;
 use uhc\command\RespawnCommand;
-use uhc\command\TellCommand;
 use uhc\command\TopKillsCommand;
 use uhc\command\UHCCommand;
 use uhc\entity\DisconnectedMob;
@@ -34,16 +34,12 @@ use uhc\team\TeamFactory;
 use uhc\world\WorldFactory;
 
 final class UHC extends PluginBase {
+    use SingletonTrait;
 
-    static private UHC $instance;
     private Game $game;
 
-    static public function getInstance(): UHC {
-        return self::$instance;
-    }
-
     protected function onLoad(): void {
-        self::$instance = $this;    
+        self::setInstance($this);
     }
 
     protected function onEnable(): void {
