@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace uhc\session\scoreboard;
 
-use pocketmine\network\mcpe\protocol\RemoveObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetDisplayObjectivePacket;
 use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
@@ -35,13 +34,6 @@ final class ScoreboardBuilder {
             SetDisplayObjectivePacket::SORT_ORDER_ASCENDING
         );
         $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
-    }
-
-    public function despawn(): void {
-        $pk = RemoveObjectivePacket::create(
-            $this->session->getPlayer()?->getName()
-        );
-        $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($pk);
     }
 
     public function clear(): void {
@@ -99,8 +91,13 @@ final class ScoreboardBuilder {
                 $scenarios = array_values(array_filter(ScenarioFactory::getAll(), function (Scenario $scenario): bool {
                     return $scenario->isEnabled();
                 }));
-                
                 $lines[] = ' &fPlayers: &b' . count($players);
+
+                if ($game->getWorld() === null) {
+                    $lines[] = ' &r';
+                    $lines[] = ' &o&7Please, do /uhc setup ';
+                    break;
+                }
                 $lines[] = ' &fMode: &b' . (!$game->getProperties()->isTeam() ? 'FFA' : 'TO' . TeamFactory::getProperties()->getMaxPlayers());
                 $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
                 $lines[] = '&r';
