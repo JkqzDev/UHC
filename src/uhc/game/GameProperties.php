@@ -8,14 +8,18 @@ final class GameProperties {
 
     public function __construct(
         private int $appleRate = 20,
+        private int $leatherCount = 10,
         private bool $team = false,
         private bool $globalMute = false,
         private ?string $host = null
-    ) {
-    }
+    ) {}
 
     public function getAppleRate(): int {
         return $this->appleRate;
+    }
+
+    public function getLeatherCount(): int {
+        return $this->leatherCount;
     }
 
     public function isTeam(): bool {
@@ -32,6 +36,10 @@ final class GameProperties {
 
     public function setAppleRate(int $rate): void {
         $this->appleRate = $rate;
+    }
+
+    public function setLeatherCount(int $leatherCount): void {
+        $this->leatherCount = $leatherCount;
     }
 
     public function setTeam(bool $team): void {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace uhc\menu;
 
 use muqsit\invmenu\InvMenu;
+use uhc\menu\setup\LeatherCountMenu;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\InvMenuTypeIds;
@@ -41,6 +42,9 @@ final class SetupMenu {
         // Apple rate
         $apple_rate = VanillaItems::APPLE();
         $apple_rate->setCustomName(TextFormat::colorize('&r&9Apple Rate'));
+        // Leather Count
+        $leather_count = VanillaItems::LEATHER();
+        $leather_count->setCustomName(TextFormat::colorize('&r&2Leather Count'));
         // Teams
         $teams = VanillaItems::DIAMOND_CHESTPLATE();
         $teams->setCustomName(TextFormat::colorize('&r&dTeam'));
@@ -54,15 +58,24 @@ final class SetupMenu {
             $grace_time,
             $scenarios,
             $apple_rate,
+            $leather_count,
             $teams,
             $announcement
         );
         
-        $menu->setListener(function (InvMenuTransaction $transaction) use ($heal_time, $globalmute_time, $grace_time, $scenarios, $apple_rate, $teams, $announcement): InvMenuTransactionResult {
+        $menu->setListener(function (InvMenuTransaction $transaction) use ($leather_count, $heal_time, $globalmute_time, $grace_time, $scenarios, $apple_rate, $teams, $announcement): InvMenuTransactionResult {
             $player = $transaction->getPlayer();
             $item = $transaction->getItemClicked();
-            
-            if ($item->equals($heal_time)) {
+
+            if ($item->equals($leather_count)) {
+                $player->removeCurrentWindow();
+
+                UHC::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
+                    if ($player->isOnline()) {
+                        new LeatherCountMenu($player);
+                    }
+                }), 2);
+            } elseif ($item->equals($heal_time)) {
                 $player->removeCurrentWindow();
                 
                 UHC::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
