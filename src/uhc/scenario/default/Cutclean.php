@@ -19,14 +19,14 @@ final class Cutclean extends Scenario {
         $block = $event->getBlock();
         $drops = $event->getDrops();
         $xpDrop = $event->getXpDropAmount();
-        
+
         if (!$event->isCancelled()) {
             switch ($block->getId()) {
                 case BlockLegacyIds::IRON_ORE:
                     $drops = [VanillaItems::IRON_INGOT()];
                     $xpDrop = mt_rand(1, 3);
                     break;
-                
+
                 case BlockLegacyIds::GOLD_ORE:
                     $drops = [VanillaItems::GOLD_INGOT()];
                     $xpDrop = mt_rand(2, 4);

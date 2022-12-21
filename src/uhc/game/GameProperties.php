@@ -7,10 +7,10 @@ namespace uhc\game;
 final class GameProperties {
 
     public function __construct(
-        private int $appleRate = 20,
-        private int $leatherCount = 10,
-        private bool $team = false,
-        private bool $globalMute = false,
+        private int     $appleRate = 20,
+        private int     $leatherCount = 10,
+        private bool    $team = false,
+        private bool    $globalMute = false,
         private ?string $host = null
     ) {}
 

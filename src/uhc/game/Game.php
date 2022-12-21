@@ -38,12 +38,12 @@ final class Game {
     private PositionCache $positionCache;
 
     public function __construct(
-        private int $status = GameStatus::WAITING,
-        private int $globalTime = 0,
-        private int $startingTime = 15,
-        private int $graceTime = 20 * 60,
-        private int $finalhealTime = 10 * 60,
-        private int $globalmuteTime = 15 * 60,
+        private int    $status = GameStatus::WAITING,
+        private int    $globalTime = 0,
+        private int    $startingTime = 15,
+        private int    $graceTime = 20 * 60,
+        private int    $finalhealTime = 10 * 60,
+        private int    $globalmuteTime = 15 * 60,
         private ?World $world = null
     ) {
         $this->properties = new GameProperties;
@@ -59,7 +59,7 @@ final class Game {
 
         UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ClosureTask(function (): void {
             $world = $this->world;
-            
+
             if ($world === null) {
                 return;
             }
@@ -74,6 +74,50 @@ final class Game {
             }
             UHC::getInstance()->getLogger()->notice('[Clear] ' . $count . ' entities cleaned');
         }), 5 * 60 * 20);
+    }
+
+    public function running(): void {
+        switch ($this->status) {
+            case GameStatus::STARTING:
+                $this->startingTime--;
+
+                if ($this->startingTime <= 0) {
+                    $this->startGame();
+
+                    foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+                        if ($player->isImmobile()) {
+                            $player->setImmobile(false);
+                        }
+                    }
+                    return;
+                }
+                break;
+
+            case GameStatus::RUNNING:
+                $this->globalTime++;
+                if ($this->finalhealTime === $this->globalTime) {
+                    foreach (Server::getInstance()->getOnlinePlayers() as $player) {
+                        $player->setHealth($player->getMaxHealth());
+                        $player->sendMessage(TextFormat::colorize('&aYour health has been regenerated'));
+                    }
+                }
+
+                if ($this->globalmuteTime === $this->globalTime) {
+                    $this->properties->setGlobalMute(false);
+                }
+
+                if ($this->graceTime === $this->globalTime) {
+                    Server::getInstance()->broadcastMessage(TextFormat::colorize('&eThe grace period has ended. Good luck!'));
+                }
+                break;
+        }
+    }
+
+    public function startGame(): void {
+        $event = new GameStartEvent($this);
+        $event->call();
+
+        $this->status = GameStatus::RUNNING;
     }
 
     public function delete(): void {
@@ -145,15 +189,15 @@ final class Game {
     public function setGraceTime(int $time): void {
         $this->graceTime = $time;
     }
-    
+
     public function setFinalHealTime(int $time): void {
         $this->finalhealTime = $time;
     }
-    
+
     public function setGlobalmuteTime(int $time): void {
         $this->globalmuteTime = $time;
     }
-    
+
     public function setWorld(World $word): void {
         $this->world = $word;
     }
@@ -174,7 +218,7 @@ final class Game {
                 Server::getInstance()->broadcastMessage(TextFormat::colorize('&aTeam #' . $team->getId() . ' has won the game!'));
                 DiscordFeed::sendWinMessage();
                 TwitterFeed::sendWinMessage();
-                
+
                 $this->stopGame();
             }
             return;
@@ -190,19 +234,26 @@ final class Game {
             Server::getInstance()->broadcastMessage(TextFormat::colorize('&a' . $player->getName() . ' has won the game!'));
             DiscordFeed::sendWinMessage();
             TwitterFeed::sendWinMessage();
-            
+
             $this->stopGame();
         }
     }
-    
+
+    public function stopGame(): void {
+        $event = new GameStopEvent($this);
+        $event->call();
+
+        $this->status = GameStatus::RESTARTING;
+    }
+
     public function startScattering(): void {
         $this->status = GameStatus::SCATTERING;
-        
+
         if ($this->properties->isTeam()) {
             $sessions = array_filter(SessionFactory::getAll(), function (Session $session): bool {
                 return $session->isOnline() && $session->getTeam() === null;
             });
-            
+
             foreach ($sessions as $session) {
                 TeamFactory::create($session);
             }
@@ -223,56 +274,5 @@ final class Game {
         $this->properties->setGlobalMute(true);
 
         UHC::getInstance()->getScheduler()->scheduleRepeatingTask(new ScatteringTask, 15);
-    }
-    
-    public function startGame(): void {
-        $event = new GameStartEvent($this);
-        $event->call();
-
-        $this->status = GameStatus::RUNNING;
-    }
-    
-    public function stopGame(): void {
-        $event = new GameStopEvent($this);
-        $event->call();
-
-        $this->status = GameStatus::RESTARTING;
-    }
-    
-    public function running(): void {
-        switch ($this->status) {
-            case GameStatus::STARTING:
-                $this->startingTime--;
-                
-                if ($this->startingTime <= 0) {
-                    $this->startGame();
-
-                    foreach (Server::getInstance()->getOnlinePlayers() as $player) {
-                        if ($player->isImmobile()) {
-                            $player->setImmobile(false);
-                        }
-                    }
-                    return;
-                }
-                break;
-            
-            case GameStatus::RUNNING:
-                $this->globalTime++;
-                if ($this->finalhealTime === $this->globalTime) {
-                    foreach (Server::getInstance()->getOnlinePlayers() as $player) {
-                        $player->setHealth($player->getMaxHealth());
-                        $player->sendMessage(TextFormat::colorize('&aYour health has been regenerated'));
-                    }
-                }
-
-                if ($this->globalmuteTime === $this->globalTime) {
-                    $this->properties->setGlobalMute(false);
-                }
-
-                if ($this->graceTime === $this->globalTime) {
-                    Server::getInstance()->broadcastMessage(TextFormat::colorize('&eThe grace period has ended. Good luck!'));
-                }
-                break;
-        }
     }
 }

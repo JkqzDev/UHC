@@ -10,11 +10,8 @@ use uhc\UHC;
 
 final class SessionFactory {
 
+    /** @var Session[] */
     static private array $sessions = [];
-
-    static public function getAll(): array {
-        return self::$sessions;
-    }
 
     static public function get(Player|string $player): ?Session {
         $guid = $player instanceof Player ? $player->getXuid() : $player;
@@ -32,5 +29,9 @@ final class SessionFactory {
                 $session->update();
             }
         }), 10);
+    }
+
+    static public function getAll(): array {
+        return self::$sessions;
     }
 }

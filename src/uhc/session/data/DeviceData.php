@@ -23,12 +23,12 @@ final class DeviceData {
     public const SWITCH = 12;
     public const XBOX = 13;
     public const LINUX = 20;
-    
+
     public const KEYBOARD = 1;
     public const TOUCH = 2;
     public const CONTROLLER = 3;
     public const MOTION_CONTROLLER = 4;
-    
+
     static private array $deviceOSVVars = [
         self::ANDROID => 'Android',
         self::IOS => 'iOS',
@@ -52,17 +52,17 @@ final class DeviceData {
         self::CONTROLLER => 'Controller',
         self::MOTION_CONTROLLER => 'Motion-Controller'
     ];
-    
+
     static public function getOS(Player $player): string {
-        $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();   
+        $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();
         return self::$deviceOSVVars[$extraData['DeviceOS']] ?? 'Unknown';
     }
-    
+
     static public function getOSInt(Player $player): int {
         $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();
         return $extraData['DeviceOS'];
     }
-    
+
     static public function getInputInt(Player $player): int {
         $extraData = $player->getNetworkSession()->getPlayerInfo()->getExtraData();
         return $extraData['CurrentInputMode'];

@@ -10,19 +10,19 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use uhc\discord\DiscordFeed;
-use uhc\entity\DisconnectedMob;
+use uhc\player\entity\DisconnectedMob;
 use uhc\session\Session;
 use uhc\UHC;
 
 final class Disconnected {
 
     public function __construct(
-        private Session $session,
-        private int $expiration,
-        private float $health,
-        private array $armorInventory,
-        private array $inventory,
-        private Location $location,
+        private Session          $session,
+        private int              $expiration,
+        private float            $health,
+        private array            $armorInventory,
+        private array            $inventory,
+        private Location         $location,
         private ?DisconnectedMob $disconnectedMob = null
     ) {
         $this->spawn();
@@ -44,16 +44,12 @@ final class Disconnected {
         $this->disconnectedMob = $mob;
     }
 
-    public function getSession(): Session {
-        return $this->session;
-    }
-
-    public function getHealth(): float {
-        return $this->health;
-    }
-
     public function getArmorInventory(): array {
         return $this->armorInventory;
+    }
+
+    public function getSession(): Session {
+        return $this->session;
     }
 
     public function getInventory(): array {
@@ -76,6 +72,10 @@ final class Disconnected {
             $player->teleport($this->location->asPosition());
         }
         DisconnectedFactory::remove($this->session->getXuid());
+    }
+
+    public function getHealth(): float {
+        return $this->health;
     }
 
     /**

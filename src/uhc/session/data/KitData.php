@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace uhc\session\data;
 
-use uhc\UHC;
 use pocketmine\item\VanillaItems;
 use pocketmine\player\GameMode;
 use pocketmine\player\Player;
+use uhc\item\menu\MenuScenariosItem;
+use uhc\UHC;
 
 final class KitData {
 
@@ -18,6 +19,14 @@ final class KitData {
         $player->getInventory()->setContents([
             VanillaItems::STEAK()->setCount($game->getProperties()->getLeatherCount()),
             VanillaItems::LEATHER()->setCount(10)
+        ]);
+    }
+
+    static public function lobby(Player $player): void {
+        $player->setGamemode(GameMode::ADVENTURE());
+
+        $player->getInventory()->setContents([
+            0 => new MenuScenariosItem,
         ]);
     }
 

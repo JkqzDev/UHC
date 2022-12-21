@@ -22,7 +22,7 @@ final class ScenariosCommand extends Command {
             return $scenario->isEnabled();
         });
         $sender->sendMessage(TextFormat::colorize('&bScenarios Enabled'));
-        
+
         foreach ($scenarios as $scenario) {
             $sender->sendMessage(TextFormat::colorize('&b' . $scenario->getName() . ' &7- &3' . $scenario->getDescription()));
         }

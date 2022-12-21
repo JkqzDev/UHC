@@ -19,17 +19,17 @@ use uhc\UHC;
 final class Team {
 
     public function __construct(
-        private int $id,
-        private Session $owner,
-        private bool $scattered = false,
-        private array $members = [],
+        private int       $id,
+        private Session   $owner,
+        private bool      $scattered = false,
+        private array     $members = [],
         private ?Position $position = null
     ) {
         $this->addMember($owner);
     }
 
-    public function getId(): int {
-        return $this->id;
+    public function addMember(Session $session): void {
+        $this->members[spl_object_hash($session)] = $session;
     }
 
     public function getKills(): int {
@@ -43,12 +43,6 @@ final class Team {
 
     public function getMembers(): array {
         return $this->members;
-    }
-
-    public function getOnlineMembers(): array {
-        return array_filter($this->members, function (Session $session): bool {
-            return $session->isOnline();
-        });
     }
 
     public function getKeyboardMembers(): array {
@@ -65,28 +59,24 @@ final class Team {
         return $this->scattered;
     }
 
-    public function isAlive(): bool {
-        $members = array_filter($this->members, function (Session $session): bool {
-            return $session->isAlive();
-        });
-
-        return count($members) > 0;
-    }
-
     public function equals(?Team $team): bool {
         return $team !== null && $this->id === $team->getId();
+    }
+
+    public function getId(): int {
+        return $this->id;
     }
 
     public function getPosition(): ?Position {
         return $this->position;
     }
 
-    public function addMember(Session $session): void {
-        $this->members[spl_object_hash($session)] = $session;
-    }
-
     public function removeMember(Session $session): void {
         unset($this->members[spl_object_hash($session)]);
+    }
+
+    public function chat(Player $player, string $message): void {
+        $this->broadcast('&e[Party Chat] ' . $player->getName() . ': ' . $message);
     }
 
     public function broadcast(string $message): void {
@@ -95,8 +85,10 @@ final class Team {
         }
     }
 
-    public function chat(Player $player, string $message): void {
-        $this->broadcast('&e[Party Chat] ' . $player->getName() . ': ' . $message);
+    public function getOnlineMembers(): array {
+        return array_filter($this->members, function (Session $session): bool {
+            return $session->isOnline();
+        });
     }
 
     public function scatter(): void {
@@ -140,6 +132,14 @@ final class Team {
             $this->scattered = true;
             $this->position = $position;
         }));
+    }
+
+    public function isAlive(): bool {
+        $members = array_filter($this->members, function (Session $session): bool {
+            return $session->isAlive();
+        });
+
+        return count($members) > 0;
     }
 
     public function disband(): void {

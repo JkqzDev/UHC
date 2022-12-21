@@ -17,8 +17,8 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerExhaustEvent;
 use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\item\ItemIds;
 use pocketmine\item\VanillaItems;
@@ -38,18 +38,16 @@ final class EventHandler implements Listener {
     public function __construct(
         private array $lastHit = []
     ) {}
-    
+
     public function handleBreak(BlockBreakEvent $event): void {
         $block = $event->getBlock();
         $item = $event->getItem();
         $player = $event->getPlayer();
         $game = UHC::getInstance()->getGame();
-        
-        if ($game->getStatus() < GameStatus::RUNNING) {
-            if ($player->hasPermission('build.permission')) {
-                $event->cancel();
-                return;
-            }
+
+        if ($game->getStatus() < GameStatus::RUNNING && !$player->hasPermission('build.permission')) {
+            $event->cancel();
+            return;
         }
 
         if ($block->getId() === BlockLegacyIds::LEAVES || $block->getId() === BlockLegacyIds::LEAVES2) {
@@ -65,16 +63,19 @@ final class EventHandler implements Listener {
             }
         }
     }
-    
+
     public function handlePlace(BlockPlaceEvent $event): void {
         $player = $event->getPlayer();
         $game = UHC::getInstance()->getGame();
-        
-        if ($game->getStatus() < GameStatus::RUNNING) {
-            if ($player->hasPermission('build.permission')) {
-                $event->cancel();
-            }
+
+        if ($game->getStatus() > GameStatus::RUNNING) {
+            return;
         }
+
+        if ($player->hasPermission('build.permission')) {
+            return;
+        }
+        $event->cancel();
     }
 
     public function handleDamage(EntityDamageEvent $event): void {
@@ -93,6 +94,10 @@ final class EventHandler implements Listener {
 
         if ($cause === EntityDamageEvent::CAUSE_VOID) {
             $player->teleport($player->getWorld()->getSpawnLocation());
+        }
+
+        if ($session->isInPractice()) {
+            return;
         }
 
         if ($game->getStatus() !== GameStatus::RUNNING) {
@@ -131,7 +136,7 @@ final class EventHandler implements Listener {
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . '&c♥'));
         AlertMessages::handleAlertDamage($player, $event);
     }
-    
+
     public function handleRegainHealth(EntityRegainHealthEvent $event): void {
         $cause = $event->getRegainReason();
         $entity = $event->getEntity();
@@ -170,11 +175,11 @@ final class EventHandler implements Listener {
             return;
         }
         $doNotDisturb = ScenarioFactory::get('Do Not Disturb');
-        $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 
+        $message = '&c' . $player->getName() . ' &7[&f' . $session->getKills() . '&7] &edied';
 
         if (isset($this->lastHit[$player->getXuid()])) {
             $data = $this->lastHit[$player->getXuid()];
-            
+
             if ($data['time'] > time()) {
                 /** @var Session */
                 $damager = $data['damager'];
@@ -197,9 +202,9 @@ final class EventHandler implements Listener {
         $game->getInventoryCache()->addInventory($player->getXuid(), $player->getArmorInventory()->getContents(), $player->getInventory()->getContents());
         $game->getPositionCache()->addPosition($player->getXuid(), $player->getPosition());
         $game->checkWinner();
-        
+
         $message = TextFormat::colorize($message);
-        
+
         $event->setDeathMessage($message);
         DiscordFeed::sendKillMessage(TextFormat::clean($message));
     }
@@ -207,33 +212,38 @@ final class EventHandler implements Listener {
     public function handleExhaust(PlayerExhaustEvent $event): void {
         $game = UHC::getInstance()->getGame();
 
-        if ($game->getStatus() < GameStatus::RUNNING) {
-            $event->cancel();
+        if ($game->getStatus() > GameStatus::RUNNING) {
+            return;
         }
+        $event->cancel();
     }
-    
+
     public function handleJoin(PlayerJoinEvent $event): void {
         $player = $event->getPlayer();
         $session = SessionFactory::get($player);
-
         $session?->join();
 
         $event->setJoinMessage(TextFormat::colorize('&7[&a+&7] &a' . $player->getName()));
     }
-    
+
     public function handleMove(PlayerMoveEvent $event): void {
         $from = $event->getFrom();
         $player = $event->getPlayer();
         $to = $event->getTo();
         $game = UHC::getInstance()->getGame();
-        
-        if ($game->getStatus() > GameStatus::STARTING) {
-            if (!$from->equals($to)) {
-                if (!$game->getBorder()->insideBorder($player)) {
-                    $game->getBorder()->teleportInside($player);
-                }
-            }
+
+        if ($game->getStatus() < GameStatus::STARTING) {
+            return;
         }
+
+        if ($from->distance($to) < 0.001) {
+            return;
+        }
+
+        if ($game->getBorder()->insideBorder($player)) {
+            return;
+        }
+        $game->getBorder()->teleportInside($player);
     }
 
     public function handleLogin(PlayerLoginEvent $event): void {
@@ -252,7 +262,6 @@ final class EventHandler implements Listener {
     public function handleQuit(PlayerQuitEvent $event): void {
         $player = $event->getPlayer();
         $session = SessionFactory::get($player);
-
         $session?->quit();
 
         $event->setQuitMessage(TextFormat::colorize('&7[&c-&7] &c' . $player->getName()));

@@ -10,15 +10,11 @@ final class WorldFactory {
 
     static private array $worlds = [];
 
-    static public function getAll(): array {
-        return self::$worlds;
-    }
-
     static public function randomName(int $length): string {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $randomString = '';
-        
+
         for ($i = 0; $i < $length; $i++) {
             $randomString .= $characters[rand(0, $charactersLength - 1)];
         }
@@ -34,15 +30,15 @@ final class WorldFactory {
         return $worlds[array_rand($worlds)];
     }
 
-    static public function create(string $worldName): void {
-        self::$worlds[$worldName] = new World($worldName);
+    static public function getAll(): array {
+        return self::$worlds;
     }
 
     static public function loadAll(): void {
         if (!is_dir(UHC::getInstance()->getDataFolder() . 'worlds')) {
             @mkdir(UHC::getInstance()->getDataFolder() . 'worlds');
         }
-        
+
         foreach (scandir(UHC::getInstance()->getDataFolder() . 'worlds') as $worldName) {
             if ($worldName === '.' || $worldName === '..') {
                 continue;
@@ -53,5 +49,9 @@ final class WorldFactory {
             }
             self::create($worldName);
         }
+    }
+
+    static public function create(string $worldName): void {
+        self::$worlds[$worldName] = new World($worldName);
     }
 }

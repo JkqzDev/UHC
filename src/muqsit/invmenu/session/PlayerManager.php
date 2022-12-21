@@ -14,54 +14,54 @@ use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use ReflectionProperty;
 
-final class PlayerManager{
+final class PlayerManager {
 
-	private PlayerNetworkHandlerRegistry $network_handler_registry;
+    private PlayerNetworkHandlerRegistry $network_handler_registry;
 
-	/** @var PlayerSession[] */
-	private array $sessions = [];
-	
-	public function __construct(Plugin $registrant){
-		$this->network_handler_registry = new PlayerNetworkHandlerRegistry();
+    /** @var PlayerSession[] */
+    private array $sessions = [];
 
-		$plugin_manager = Server::getInstance()->getPluginManager();
-		$plugin_manager->registerEvent(PlayerLoginEvent::class, function(PlayerLoginEvent $event) : void{
-			$this->create($event->getPlayer());
-		}, EventPriority::MONITOR, $registrant);
-		$plugin_manager->registerEvent(PlayerQuitEvent::class, function(PlayerQuitEvent $event) : void{
-			$this->destroy($event->getPlayer());
-		}, EventPriority::MONITOR, $registrant);
-	}
+    public function __construct(Plugin $registrant) {
+        $this->network_handler_registry = new PlayerNetworkHandlerRegistry();
 
-	private function create(Player $player) : void{
-		static $_playerInfo = null;
-		if($_playerInfo === null){
-			$_playerInfo = new ReflectionProperty(Player::class, "playerInfo");
-			$_playerInfo->setAccessible(true);
-		}
+        $plugin_manager = Server::getInstance()->getPluginManager();
+        $plugin_manager->registerEvent(PlayerLoginEvent::class, function (PlayerLoginEvent $event): void {
+            $this->create($event->getPlayer());
+        }, EventPriority::MONITOR, $registrant);
+        $plugin_manager->registerEvent(PlayerQuitEvent::class, function (PlayerQuitEvent $event): void {
+            $this->destroy($event->getPlayer());
+        }, EventPriority::MONITOR, $registrant);
+    }
 
-		$this->sessions[$player->getId()] = new PlayerSession($player, new PlayerNetwork(
-			$player->getNetworkSession(),
-			$this->network_handler_registry->get($_playerInfo->getValue($player)->getExtraData()["DeviceOS"] ?? -1)
-		));
-	}
+    private function create(Player $player): void {
+        static $_playerInfo = null;
+        if ($_playerInfo === null) {
+            $_playerInfo = new ReflectionProperty(Player::class, "playerInfo");
+            $_playerInfo->setAccessible(true);
+        }
 
-	private function destroy(Player $player) : void{
-		if(isset($this->sessions[$player_id = $player->getId()])){
-			$this->sessions[$player_id]->finalize();
-			unset($this->sessions[$player_id]);
-		}
-	}
+        $this->sessions[$player->getId()] = new PlayerSession($player, new PlayerNetwork(
+            $player->getNetworkSession(),
+            $this->network_handler_registry->get($_playerInfo->getValue($player)->getExtraData()["DeviceOS"] ?? -1)
+        ));
+    }
 
-	public function get(Player $player) : PlayerSession{
-		return $this->sessions[$player->getId()];
-	}
+    public function get(Player $player): PlayerSession {
+        return $this->sessions[$player->getId()];
+    }
 
-	public function getNullable(Player $player) : ?PlayerSession{
-		return $this->sessions[$player->getId()] ?? null;
-	}
+    private function destroy(Player $player): void {
+        if (isset($this->sessions[$player_id = $player->getId()])) {
+            $this->sessions[$player_id]->finalize();
+            unset($this->sessions[$player_id]);
+        }
+    }
 
-	public function getNetworkHandlerRegistry() : PlayerNetworkHandlerRegistry{
-		return $this->network_handler_registry;
-	}
+    public function getNullable(Player $player): ?PlayerSession {
+        return $this->sessions[$player->getId()] ?? null;
+    }
+
+    public function getNetworkHandlerRegistry(): PlayerNetworkHandlerRegistry {
+        return $this->network_handler_registry;
+    }
 }

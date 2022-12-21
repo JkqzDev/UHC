@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace uhc\world\async;
 
 use Closure;
-use pocketmine\Server;
 use pocketmine\scheduler\AsyncTask;
+use pocketmine\Server;
 
 final class WorldCopyAsync extends AsyncTask {
 
     public function __construct(
-        private string $world,
-        private string $directory,
-        private string $newName,
-        private string $newDirectory,
+        private string   $world,
+        private string   $directory,
+        private string   $newName,
+        private string   $newDirectory,
         private ?Closure $callback
     ) {}
 

@@ -2,32 +2,32 @@
 
 declare(strict_types=1);
 
-namespace uhc\menu\setup;
+namespace uhc\menu\config;
 
-use uhc\UHC;
-use uhc\menu\SetupMenu;
 use muqsit\invmenu\InvMenu;
-use pocketmine\item\ItemIds;
-use pocketmine\player\Player;
-use pocketmine\utils\TextFormat;
-use pocketmine\item\ItemFactory;
-use pocketmine\scheduler\ClosureTask;
-use muqsit\invmenu\type\InvMenuTypeIds;
 use muqsit\invmenu\transaction\InvMenuTransaction;
 use muqsit\invmenu\transaction\InvMenuTransactionResult;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
+use pocketmine\player\Player;
+use pocketmine\scheduler\ClosureTask;
+use pocketmine\utils\TextFormat;
+use uhc\menu\ConfigMenu;
+use uhc\UHC;
 
-final class LeatherCountMenu {
+final class GlobalmuteTimeMenu {
 
     public function __construct(Player $player) {
         $game = UHC::getInstance()->getGame();
 
-        $max = 60;
-        $min = 1;
+        $max = 60 * 60;
+        $min = 60;
 
-        $menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
+        $menu = InvMenu::create(InvMenu::TYPE_CHEST);
         $menu->getInventory()->setContents($this->getItems($max, $min));
 
         $menu->setListener(function (InvMenuTransaction $transaction) use ($menu, $game, $max, $min): InvMenuTransactionResult {
+            $action = $transaction->getAction();
             $item = $transaction->getItemClicked();
             $player = $transaction->getPlayer();
             $custom_name = TextFormat::clean($item->getCustomName());
@@ -37,29 +37,29 @@ final class LeatherCountMenu {
 
                 UHC::getInstance()->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player): void {
                     if ($player->isOnline()) {
-                        new SetupMenu($player);
+                        new ConfigMenu($player);
                     }
                 }), 2);
                 return $transaction->discard();
             }
 
             if ($custom_name === '-1' || $custom_name === '-5') {
-                $rem = $custom_name === '-1' ? 1 : 5;
-                $value = $game->getProperties()->getLeatherCount() - $rem;
+                $rem = $custom_name === '-1' ? 60 : 60 * 5;
+                $value = $game->getGlobalmuteTime() - $rem;
 
                 if ($value >= $min) {
-                    $game->getProperties()->setLeatherCount($value);
+                    $game->setGlobalmuteTime($value);
                     $menu->getInventory()->setContents($this->getItems($max, $min));
                 }
                 return $transaction->discard();
             }
 
             if ($custom_name === '+1' || $custom_name === '+5') {
-                $add = $custom_name === '+1' ? 1 : 5;
-                $value = $game->getProperties()->getLeatherCount() + $add;
+                $add = $custom_name === '+1' ? 60 : 60 * 5;
+                $value = $game->getGlobalmuteTime() + $add;
 
                 if ($value <= $max) {
-                    $game->getProperties()->setLeatherCount($value);
+                    $game->setGlobalmuteTime($value);
                     $menu->getInventory()->setContents($this->getItems($max, $min));
                 }
                 return $transaction->discard();
@@ -67,22 +67,22 @@ final class LeatherCountMenu {
 
             return $transaction->discard();
         });
-        $menu->send($player, TextFormat::colorize('&9Leather Count Configuration'));
+        $menu->send($player, TextFormat::colorize('&gGlobalmute Time Configuration'));
     }
 
     private function getItems(int $max, int $min): array {
         $game = UHC::getInstance()->getGame();
 
-        $leather_count = $game->getProperties()->getLeatherCount();
+        $time = $game->getGlobalmuteTime();
         $text = [
             TextFormat::colorize('&r&7------------------------'),
-            TextFormat::colorize('&r&eCurrent Value: &f' . $leather_count)
+            TextFormat::colorize('&r&eCurrent Value: &f' . ($time === 60 * 60 ? gmdate('H:i:s', $time) : gmdate('i:s', $time)))
         ];
 
-        if ($leather_count === $max) {
+        if ($time === $max) {
             $text[] = TextFormat::colorize('&r');
             $text[] = TextFormat::colorize('&c&r&cExceeded the maximum value');
-        } elseif ($leather_count === $min) {
+        } elseif ($time === $min) {
             $text[] = TextFormat::colorize('&r');
             $text[] = TextFormat::colorize('&c&r&cExceeded the minimum value');
         }

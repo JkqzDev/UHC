@@ -31,23 +31,20 @@ final class Session {
         private string $uuid,
         private string $xuid,
         private string $name,
-        private int $kills = 0,
-        private int $deviceId = 0,
-        private int $inputId = 0,
-        private bool $host = false,
-        private bool $spectator = false,
-        private bool $scattered = false,
-        private ?Team $team = null
+        private int    $kills = 0,
+        private int    $deviceId = 0,
+        private int    $inputId = 0,
+        private bool   $host = false,
+        private bool   $spectator = false,
+        private bool   $scattered = false,
+        private bool   $inPractice = false,
+        private ?Team  $team = null
     ) {
         $this->setScoreboard(new ScoreboardBuilder($this, '&l&bUHC&r'));
     }
 
     public function getXuid(): string {
         return $this->xuid;
-    }
-
-    public function getName(): string {
-        return $this->name;
     }
 
     public function getKills(): int {
@@ -57,49 +54,41 @@ final class Session {
     public function getInputId(): int {
         return $this->inputId;
     }
-    
+
     public function isHost(): bool {
         return $this->host;
     }
-    
-    public function isSpectator(): bool {
-        return $this->spectator;
-    }
-    
-    public function isScattered(): bool {
-        return $this->scattered;
-    }
 
-    public function isAlive(): bool {
-        return !$this->spectator && !$this->host;
-    }
-    
     public function isOnline(): bool {
         return $this->getPlayer() !== null;
-    }
-
-    public function getTeam(): ?Team {
-        return $this->team;
     }
 
     public function getPlayer(): ?Player {
         return Server::getInstance()->getPlayerByRawUUID($this->uuid);
     }
 
+    public function getTeam(): ?Team {
+        return $this->team;
+    }
+
     public function setName(string $name): void {
         $this->name = $name;
     }
-    
+
     public function setSpectator(bool $spectator): void {
         $this->spectator = $spectator;
     }
-    
+
     public function setHost(bool $host): void {
         $this->host = $host;
     }
-    
+
     public function setScattered(bool $scattered): void {
         $this->scattered = $scattered;
+    }
+
+    public function setInPractice(bool $inPractice): void {
+        $this->inPractice = $inPractice;
     }
 
     public function setTeam(?Team $team): void {
@@ -174,15 +163,15 @@ final class Session {
         switch ($game->getStatus()) {
             case GameStatus::WAITING:
                 $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
-                $player->setGamemode(GameMode::ADVENTURE());
-
                 $this->clear();
+
+                KitData::lobby($player);
                 break;
 
             case GameStatus::SCATTERING:
                 if ($game->getProperties()->isTeam()) {
                     $team = $this->team;
-                    
+
                     if ($team !== null) {
                         if (!$team->isScattered()) {
                             $player->teleport($player->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
@@ -224,7 +213,7 @@ final class Session {
                 if ($this->isAlive()) {
                     if (!$this->scattered) {
                         $player->teleport($game->getWorld()->getSpawnLocation());
-                        
+
                         $this->spectator = true;
                         $this->clear();
                         KitData::spectator($player);
@@ -241,10 +230,52 @@ final class Session {
         $player->setScoreTag(TextFormat::colorize('&f' . round(($player->getHealth() + $player->getAbsorption()), 1) . ' &c♥'));
     }
 
+    public function clear(): void {
+        $player = $this->getPlayer();
+
+        if ($player === null) {
+            return;
+        }
+        $player->getInventory()->clearAll();
+        $player->getArmorInventory()->clearAll();
+        $player->getOffHandInventory()->clearAll();
+        $player->getCraftingGrid()->clearAll();
+
+        $player->getEffects()->clear();
+
+        $player->setHealth($player->getMaxHealth());
+        $player->getHungerManager()->setFood($player->getHungerManager()->getMaxFood());
+
+        $player->getXpManager()->setXpAndProgress(0, 0.0);
+
+        $player->extinguish();
+    }
+
+    public function isScattered(): bool {
+        return $this->scattered;
+    }
+
+    public function isAlive(): bool {
+        return !$this->spectator && !$this->host;
+    }
+
+    public function isSpectator(): bool {
+        return $this->spectator;
+    }
+
+    public function getName(): string {
+        return $this->name;
+    }
+
     public function quit(): void {
         $player = $this->getPlayer();
 
         if ($player === null) {
+            return;
+        }
+
+        if ($this->isInPractice()) {
+
             return;
         }
         $game = UHC::getInstance()->getGame();
@@ -256,23 +287,7 @@ final class Session {
         }
     }
 
-    public function clear(): void {
-        $player = $this->getPlayer();
-
-        if ($player === null) {
-            return;
-        }
-        $player->getInventory()->clearAll();
-        $player->getArmorInventory()->clearAll();
-        $player->getOffHandInventory()->clearAll();
-        
-        $player->getEffects()->clear();
-
-        $player->setHealth($player->getMaxHealth());
-        $player->getHungerManager()->setFood($player->getHungerManager()->getMaxFood());
-        
-        $player->getXpManager()->setXpAndProgress(0, 0.0);
-
-        $player->extinguish();
+    public function isInPractice(): bool {
+        return $this->inPractice;
     }
 }

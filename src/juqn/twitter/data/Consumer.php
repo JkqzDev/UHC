@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace juqn\twitter\data;
 
 class Consumer {
-    
-	public $key;
-	public $secret;
 
-	public function __construct(string $key, string $secret) {
-		$this->key = $key;
-		$this->secret = $secret;
-	}
+    public function __construct(private string $key, private string $secret) {}
 
-	public function __toString(): string {
-		return "OAuthConsumer[key=$this->key,secret=$this->secret]";
-	}
+    public function getKey(): string {
+        return $this->key;
+    }
+
+    public function getSecret(): string {
+        return $this->secret;
+    }
+
+    public function __toString(): string {
+        return "OAuthConsumer[key=$this->key,secret=$this->secret]";
+    }
 }

@@ -12,23 +12,23 @@ use pocketmine\utils\TextFormat;
 use pocketmine\world\World;
 use staffmode\session\SessionFactory as SessionSessionFactory;
 use uhc\game\GameStatus;
-use uhc\menu\SetupMenu;
+use uhc\menu\ConfigMenu;
 use uhc\session\SessionFactory;
 use uhc\UHC;
 use uhc\world\WorldFactory;
 
 final class UHCCommand extends Command {
-    
+
     public function __construct() {
         parent::__construct('uhc', 'Command for uhc');
         $this->setPermission('uhc.command');
     }
-    
+
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (!$sender instanceof Player) {
             return;
         }
-        
+
         if (!$this->testPermission($sender)) {
             return;
         }
@@ -38,13 +38,25 @@ final class UHCCommand extends Command {
             return;
         }
         $game = UHC::getInstance()->getGame();
-        
+
         if (!isset($args[0])) {
+            $sender->sendMessage(TextFormat::colorize('&cUse /uhc help'));
             return;
         }
         $subCommand = strtolower($args[0]);
-        
+
         switch ($subCommand) {
+            case 'help':
+                $commands = [
+                    '&e/uhc setup &7- Use command to setup UHC world',
+                    '&e/uhc config &7- Use command to configure the UHC.',
+                    '&e/uhc start &7- Use command to start the UHC.',
+                    '&e/uhc host &7- Use command to add new host.'
+                ];
+
+                $sender->sendMessage(TextFormat::colorize('&eUHC Commands' . PHP_EOL . implode(PHP_EOL, $commands)));
+                break;
+
             case 'start':
                 if ($game->getStatus() !== GameStatus::WAITING) {
                     $sender->sendMessage(TextFormat::colorize('&cThe game has already started'));
@@ -52,8 +64,15 @@ final class UHCCommand extends Command {
                 }
 
                 if ($game->getWorld() === null) {
-                    $sender->sendMessage(TextFormat::colorize('&cYou have to setup to use this command'));
+                    $sender->sendMessage(TextFormat::colorize('&cYou have to config to use this command'));
                     return;
+                }
+
+                foreach (SessionFactory::getAll() as $session) {
+                    $session->clear();
+                    $session->setInPractice(false);
+                    $session->getPlayer()?->setGamemode(GameMode::ADVENTURE());
+                    $session->getPlayer()?->teleport($session->getPlayer()->getServer()->getWorldManager()->getDefaultWorld()->getSpawnLocation());
                 }
                 $game->startScattering();
                 $sender->sendMessage(TextFormat::colorize('&aThe game has starting'));
@@ -61,38 +80,39 @@ final class UHCCommand extends Command {
 
             case 'setup':
                 if ($game->getWorld() !== null) {
-                    $sender->sendMessage(TextFormat::colorize('&cYou can\'t setup again'));
+                    $sender->sendMessage(TextFormat::colorize('&cYou can\'t config again'));
                     return;
                 }
-                
+
                 if ($game->getStatus() !== GameStatus::WAITING) {
                     $sender->sendMessage(TextFormat::colorize('&cThe game has already started'));
                     return;
                 }
                 $worldData = WorldFactory::random();
-                
+
                 if ($worldData === null) {
-                    $sender->sendMessage(TextFormat::colorize('&cThere are no worlds for the setup'));
+                    $sender->sendMessage(TextFormat::colorize('&cThere are no worlds for the config'));
                     return;
                 }
                 $worldName = WorldFactory::randomName(10);
-                
+
+                $sender->sendMessage(TextFormat::colorize('&eWaiting 3-4 minutes until the setup is finished.'));
                 $worldData->copy(
                     $worldName,
                     $sender->getServer()->getDataPath() . 'worlds',
                     function (World $world) use ($sender, $session, $game): void {
                         $game->setWorld($world);
-                        
+
                         $game->getBorder()->setup($world);
                         $game->getProperties()->setHost($sender->getName());
-                        
-                        $sender->sendMessage(TextFormat::colorize('&aSetup finished!'));
+
+                        $sender->sendMessage(TextFormat::colorize('&eSetup finished!'));
                     }
                 );
                 break;
-                
+
             case 'config':
-                new SetupMenu($sender);
+                new ConfigMenu($sender);
                 break;
 
             case 'host':
@@ -111,7 +131,7 @@ final class UHCCommand extends Command {
                 if ($target === null) {
                     return;
                 }
-                
+
                 if (!$target->isHost()) {
                     $target->setHost(true);
                     $target->setSpectator(false);
@@ -149,6 +169,10 @@ final class UHCCommand extends Command {
                 }
                 $time = $minutes + $seconds;
                 $game->setGlobalTime($time);
+                break;
+
+            default:
+                $sender->sendMessage(TextFormat::colorize('&cCommand not found. Please, use /uhc help'));
                 break;
         }
     }

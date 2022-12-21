@@ -19,10 +19,6 @@ final class TeamFactory {
         return self::$teams;
     }
 
-    static public function get(int $id): ?Team {
-        return self::$teams[$id] ?? null;
-    }
-
     static public function create(Session $owner): void {
         $id = 1;
 
@@ -32,6 +28,10 @@ final class TeamFactory {
         self::$teams[$id] = $team = new Team($id, $owner);
 
         $owner->setTeam($team);
+    }
+
+    static public function get(int $id): ?Team {
+        return self::$teams[$id] ?? null;
     }
 
     static public function remove(int $id): void {

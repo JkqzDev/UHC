@@ -13,7 +13,11 @@ use pocketmine\item\ItemIdentifier;
 use pocketmine\item\ItemIds;
 use pocketmine\utils\TextFormat;
 
-final class GoldenHead extends GoldenApple {
+final class GoldenHeadItem extends GoldenApple {
+
+    public function __construct() {
+        parent::__construct(new ItemIdentifier(ItemIds::GOLDEN_APPLE, 10), 'Golden Head');
+    }
 
     static public function create(int $count = 1): Item {
         $item = ItemFactory::getInstance()->get(ItemIds::GOLDEN_APPLE, 10);
@@ -21,10 +25,6 @@ final class GoldenHead extends GoldenApple {
         $item->setCustomName(TextFormat::colorize('&r&gGolden Head'));
 
         return $item;
-    }
-
-    public function __construct() {
-        parent::__construct(new ItemIdentifier(ItemIds::GOLDEN_APPLE, 10), 'Golden Head');
     }
 
     public function getAdditionalEffects(): array {

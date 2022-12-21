@@ -11,9 +11,8 @@ use pocketmine\world\World;
 use Throwable;
 use uhc\UHC;
 
-final class BorderFiller
-{
-    
+final class BorderFiller {
+
     private SubChunkExplorer $chunkExplorer;
     private int $minX, $minZ;
     private int $maxX, $maxZ;
@@ -22,16 +21,12 @@ final class BorderFiller
     public function __construct(ChunkManager $world) {
         $this->chunkExplorer = new SubChunkExplorer($world);
     }
-    
-    private function getChunkExplorer(): SubChunkExplorer {
-        return $this->chunkExplorer;
-    }
 
     public function getHighestBlockAt(int $x, int $z, ?int &$y = null): bool {
         for ($y = 255; $y >= 0; --$y) {
             $this->getChunkExplorer()->moveTo($x, $y, $z);
             $id = $this->getChunkExplorer()->currentSubChunk->getFullBlock($x & 0xf, $y & 0xf, $z & 0xf);
-			
+
             if ($id >> 4 !== 0) {
                 $block = BlockFactory::getInstance()->get($id >> 4, $id & 0xf);
 
@@ -47,18 +42,22 @@ final class BorderFiller
 
     public function moveTo(int $x, int $y, int $z): bool {
         $this->getChunkExplorer()->moveTo($x, $y, $z);
-        
+
         if ($this->getChunkExplorer()->currentSubChunk === null) {
             try {
                 $this->getChunkExplorer()->currentSubChunk = $this->getChunkExplorer()->currentChunk->getSubChunk($y >> 4);
-            } catch(Throwable) {
+            } catch (Throwable) {
                 $this->error = true;
                 return false;
             }
         }
         return true;
     }
-    
+
+    private function getChunkExplorer(): SubChunkExplorer {
+        return $this->chunkExplorer;
+    }
+
     public function setDimensions(int $minX, int $maxX, int $minZ, int $maxZ): void {
         $this->minX = $minX;
         $this->maxX = $maxX;
@@ -72,24 +71,24 @@ final class BorderFiller
         }
         $this->getChunkExplorer()->currentSubChunk->setFullBlock($x & 0xf, $y & 0xf, $z & 0xf, $id << 4);
     }
-    
+
     public function loadChunks(World $world): void {
         $minX = $this->minX >> 4;
         $maxX = $this->maxX >> 4;
         $minZ = $this->minZ >> 4;
         $maxZ = $this->maxZ >> 4;
-        
+
         for ($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
                 $chunk = $world->getChunk($x, $z);
-                
+
                 if ($chunk === null) {
                     $world->loadChunk($x, $z);
                 }
             }
         }
     }
-    
+
     public function reloadChunks(World $world): void {
         if ($this->error) {
             UHC::getInstance()->getLogger()->error('Some chunks weren\'t found');
@@ -98,23 +97,23 @@ final class BorderFiller
         $maxX = $this->maxX >> 4;
         $minZ = $this->minZ >> 4;
         $maxZ = $this->maxZ >> 4;
-        
+
         for ($x = $minX; $x <= $maxX; ++$x) {
             for ($z = $minZ; $z <= $maxZ; ++$z) {
                 $chunk = $world->getChunk($x, $z);
-                
+
                 if ($chunk === null) {
                     continue;
                 }
                 $world->setChunk($x, $z, $chunk);
-                
+
                 foreach ($world->getChunkPlayers($x, $z) as $player) {
                     $player->doChunkRequests();
                 }
             }
         }
     }
-    
+
     public function close(): void {
         $this->getChunkExplorer()->invalidate();
     }

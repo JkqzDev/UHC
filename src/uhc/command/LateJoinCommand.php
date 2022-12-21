@@ -42,17 +42,17 @@ final class LateJoinCommand extends Command {
             $sender->sendMessage(TextFormat::colorize('&cYou can\'t use the command because grace period has ended'));
             return;
         }
-        
+
         if ($session->isScattered()) {
             $sender->sendMessage(TextFormat::colorize('&cYou were already scattered'));
             return;
         }
-        
+
         if (!$session->isSpectator()) {
             $sender->sendMessage(TextFormat::colorize('&cYou aren\'t a spectator'));
             return;
         }
-        
+
         if ($session->isHost()) {
             $sender->sendMessage(TextFormat::colorize('&cYou\'re a host'));
             return;
@@ -80,13 +80,10 @@ final class LateJoinCommand extends Command {
                 }
             }
         }
+        $catEyes = ScenarioFactory::get('Cat Eyes');
 
-        if ($game->getStatus() === GameStatus::RUNNING) {
-            $catEyes = ScenarioFactory::get('Cat Eyes');
-
-            if ($catEyes instanceof CatEyes && $catEyes->isEnabled()) {
-                $catEyes->addEffect($sender);
-            }
+        if ($catEyes instanceof CatEyes && $catEyes->isEnabled()) {
+            $catEyes->addEffect($sender);
         }
         $sender->sendMessage(TextFormat::colorize('&aYou have been given the starting items'));
         $sender->sendMessage(TextFormat::colorize('&aYou have been respawned. Good luck!'));

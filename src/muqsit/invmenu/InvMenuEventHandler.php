@@ -13,85 +13,85 @@ use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\inventory\transaction\action\SlotChangeAction;
 use pocketmine\network\mcpe\protocol\NetworkStackLatencyPacket;
 
-final class InvMenuEventHandler implements Listener{
-	
-	public function __construct(
-		private PlayerManager $player_manager
-	){}
+final class InvMenuEventHandler implements Listener {
 
-	/**
-	 * @param DataPacketReceiveEvent $event
-	 * @priority NORMAL
-	 */
-	public function onDataPacketReceive(DataPacketReceiveEvent $event) : void{
-		$packet = $event->getPacket();
-		if($packet instanceof NetworkStackLatencyPacket){
-			$player = $event->getOrigin()->getPlayer();
-			if($player !== null){
-				$this->player_manager->getNullable($player)?->getNetwork()->notify($packet->timestamp);
-			}
-		}
-	}
+    public function __construct(
+        private PlayerManager $player_manager
+    ) {}
 
-	/**
-	 * @param InventoryCloseEvent $event
-	 * @priority MONITOR
-	 */
-	public function onInventoryClose(InventoryCloseEvent $event) : void{
-		$player = $event->getPlayer();
-		$session = $this->player_manager->getNullable($player);
-		if($session === null){
-			return;
-		}
+    /**
+     * @param DataPacketReceiveEvent $event
+     * @priority NORMAL
+     */
+    public function onDataPacketReceive(DataPacketReceiveEvent $event): void {
+        $packet = $event->getPacket();
+        if ($packet instanceof NetworkStackLatencyPacket) {
+            $player = $event->getOrigin()->getPlayer();
+            if ($player !== null) {
+                $this->player_manager->getNullable($player)?->getNetwork()->notify($packet->timestamp);
+            }
+        }
+    }
 
-		$current = $session->getCurrent();
-		if($current !== null && $event->getInventory() === $current->menu->getInventory()){
-			$current->menu->onClose($player);
-		}
-		$session->getNetwork()->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success) : bool => false);
-	}
+    /**
+     * @param InventoryCloseEvent $event
+     * @priority MONITOR
+     */
+    public function onInventoryClose(InventoryCloseEvent $event): void {
+        $player = $event->getPlayer();
+        $session = $this->player_manager->getNullable($player);
+        if ($session === null) {
+            return;
+        }
 
-	/**
-	 * @param InventoryTransactionEvent $event
-	 * @priority NORMAL
-	 */
-	public function onInventoryTransaction(InventoryTransactionEvent $event) : void{
-		$transaction = $event->getTransaction();
-		$player = $transaction->getSource();
+        $current = $session->getCurrent();
+        if ($current !== null && $event->getInventory() === $current->menu->getInventory()) {
+            $current->menu->onClose($player);
+        }
+        $session->getNetwork()->waitUntil(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, 325, static fn(bool $success): bool => false);
+    }
 
-		$player_instance = $this->player_manager->get($player);
-		$current = $player_instance->getCurrent();
-		if($current === null){
-			return;
-		}
+    /**
+     * @param InventoryTransactionEvent $event
+     * @priority NORMAL
+     */
+    public function onInventoryTransaction(InventoryTransactionEvent $event): void {
+        $transaction = $event->getTransaction();
+        $player = $transaction->getSource();
 
-		$inventory = $current->menu->getInventory();
-		$network_stack_callbacks = [];
-		foreach($transaction->getActions() as $action){
-			if(!($action instanceof SlotChangeAction) || $action->getInventory() !== $inventory){
-				continue;
-			}
+        $player_instance = $this->player_manager->get($player);
+        $current = $player_instance->getCurrent();
+        if ($current === null) {
+            return;
+        }
 
-			$result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
-			$network_stack_callback = $result->getPostTransactionCallback();
-			if($network_stack_callback !== null){
-				$network_stack_callbacks[] = $network_stack_callback;
-			}
-			if($result->isCancelled()){
-				$event->cancel();
-				break;
-			}
-		}
+        $inventory = $current->menu->getInventory();
+        $network_stack_callbacks = [];
+        foreach ($transaction->getActions() as $action) {
+            if (!($action instanceof SlotChangeAction) || $action->getInventory() !== $inventory) {
+                continue;
+            }
 
-		if(count($network_stack_callbacks) > 0){
-			$player_instance->getNetwork()->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function(bool $success) use($player, $network_stack_callbacks) : bool{
-				if($success){
-					foreach($network_stack_callbacks as $callback){
-						$callback($player);
-					}
-				}
-				return false;
-			});
-		}
-	}
+            $result = $current->menu->handleInventoryTransaction($player, $action->getSourceItem(), $action->getTargetItem(), $action, $transaction);
+            $network_stack_callback = $result->getPostTransactionCallback();
+            if ($network_stack_callback !== null) {
+                $network_stack_callbacks[] = $network_stack_callback;
+            }
+            if ($result->isCancelled()) {
+                $event->cancel();
+                break;
+            }
+        }
+
+        if (count($network_stack_callbacks) > 0) {
+            $player_instance->getNetwork()->wait(PlayerNetwork::DELAY_TYPE_ANIMATION_WAIT, static function (bool $success) use ($player, $network_stack_callbacks): bool {
+                if ($success) {
+                    foreach ($network_stack_callbacks as $callback) {
+                        $callback($player);
+                    }
+                }
+                return false;
+            });
+        }
+    }
 }

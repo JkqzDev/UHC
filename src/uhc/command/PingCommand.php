@@ -18,7 +18,7 @@ final class PingCommand extends Command {
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (isset($args[0])) {
             $player = $sender->getServer()->getPlayerByPrefix($args[0]);
-            
+
             if (!$player instanceof Player) {
                 $sender->sendMessage(TextFormat::colorize('&cPlayer not found.'));
                 return;
@@ -26,7 +26,7 @@ final class PingCommand extends Command {
             $sender->sendMessage(TextFormat::colorize('&b' . $player->getName() . '\'s ping: &f' . $player->getNetworkSession()->getPing() . 'ms'));
             return;
         }
-        
+
         if (!$sender instanceof Player) {
             return;
         }

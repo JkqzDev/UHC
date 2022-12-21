@@ -29,7 +29,7 @@ final class RespawnCommand extends Command {
         if (!$sender instanceof Player) {
             return;
         }
-        
+
         if (!$this->testPermission($sender)) {
             return;
         }
@@ -69,7 +69,7 @@ final class RespawnCommand extends Command {
         if ($session->isScattered()) {
             $inventory = $game->getInventoryCache()->getInventory($player->getXuid());
             $position = $game->getPositionCache()->getPosition($player->getXuid());
-            
+
             $session->setSpectator(false);
             $session->clear();
 

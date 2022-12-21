@@ -24,50 +24,52 @@
  * Intended for use on SynicadeNetwork <https://synicade.com>
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace CortexPE\DiscordWebhookAPI;
 
 
-class Message implements \JsonSerializable {
-	/** @var array */
-	protected $data = [];
+use JsonSerializable;
 
-	public function setContent(string $content): void{
-		$this->data["content"] = $content;
-	}
+class Message implements JsonSerializable {
+    /** @var array */
+    protected $data = [];
 
-	public function getContent(): ?string{
-		return $this->data["content"];
-	}
+    public function setContent(string $content): void {
+        $this->data["content"] = $content;
+    }
 
-	public function getUsername(): ?string{
-		return $this->data["username"];
-	}
+    public function getContent(): ?string {
+        return $this->data["content"];
+    }
 
-	public function setUsername(string $username): void{
-		$this->data["username"] = $username;
-	}
+    public function getUsername(): ?string {
+        return $this->data["username"];
+    }
 
-	public function getAvatarURL(): ?string{
-		return $this->data["avatar_url"];
-	}
+    public function setUsername(string $username): void {
+        $this->data["username"] = $username;
+    }
 
-	public function setAvatarURL(string $avatarURL): void{
-		$this->data["avatar_url"] = $avatarURL;
-	}
+    public function getAvatarURL(): ?string {
+        return $this->data["avatar_url"];
+    }
 
-	public function addEmbed(Embed $embed):void{
-		if(!empty(($arr = $embed->asArray()))){
-			$this->data["embeds"][] = $arr;
-		}
-	}
+    public function setAvatarURL(string $avatarURL): void {
+        $this->data["avatar_url"] = $avatarURL;
+    }
 
-	public function setTextToSpeech(bool $ttsEnabled):void{
-		$this->data["tts"] = $ttsEnabled;
-	}
+    public function addEmbed(Embed $embed): void {
+        if (!empty(($arr = $embed->asArray()))) {
+            $this->data["embeds"][] = $arr;
+        }
+    }
 
-	public function jsonSerialize(){
-		return $this->data;
-	}
+    public function setTextToSpeech(bool $ttsEnabled): void {
+        $this->data["tts"] = $ttsEnabled;
+    }
+
+    public function jsonSerialize() {
+        return $this->data;
+    }
 }

@@ -19,22 +19,13 @@ use uhc\scenario\default\Timber;
 use uhc\scenario\default\TimeBomb;
 
 final class ScenarioFactory {
-    
+
     static private array $scenarios = [];
-    
-    static public function getAll(): array {
-        return self::$scenarios;
-    }
-    
+
     static public function get(string $name): ?Scenario {
         return self::$scenarios[$name] ?? null;
     }
-    
-    static public function create(Scenario $scenario): void {
-        self::$scenarios[$scenario->getName()] = $scenario;
-        self::sort();
-    }
-    
+
     static public function callEvent(string $method, Event $event): void {
         foreach (self::getAll() as $scenario) {
             if ($scenario->isEnabled()) {
@@ -42,7 +33,11 @@ final class ScenarioFactory {
             }
         }
     }
-    
+
+    static public function getAll(): array {
+        return self::$scenarios;
+    }
+
     static public function loadAll(): void {
         self::create(new BloodDiamond);
         self::create(new CatEyes);
@@ -57,7 +52,12 @@ final class ScenarioFactory {
         self::create(new Timber);
         self::create(new TimeBomb);
     }
-    
+
+    static public function create(Scenario $scenario): void {
+        self::$scenarios[$scenario->getName()] = $scenario;
+        self::sort();
+    }
+
     static private function sort(): void {
         $scenarios = self::getAll();
         uasort($scenarios, function (Scenario $firstScenario, Scenario $secondScenario) {

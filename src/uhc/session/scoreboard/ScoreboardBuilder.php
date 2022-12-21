@@ -9,10 +9,10 @@ use pocketmine\network\mcpe\protocol\SetScorePacket;
 use pocketmine\network\mcpe\protocol\types\ScorePacketEntry;
 use pocketmine\utils\TextFormat;
 use uhc\game\GameStatus;
-use uhc\session\SessionFactory;
-use uhc\session\Session;
-use uhc\scenario\ScenarioFactory;
 use uhc\scenario\Scenario;
+use uhc\scenario\ScenarioFactory;
+use uhc\session\Session;
+use uhc\session\SessionFactory;
 use uhc\team\Team;
 use uhc\team\TeamFactory;
 use uhc\UHC;
@@ -21,8 +21,8 @@ final class ScoreboardBuilder {
 
     public function __construct(
         private Session $session,
-        private string $title = '',
-        private array $lines = []
+        private string  $title = '',
+        private array   $lines = []
     ) {}
 
     public function spawn(): void {
@@ -36,44 +36,10 @@ final class ScoreboardBuilder {
         $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
     }
 
-    public function clear(): void {
-        $packet = new SetScorePacket;
-        $packet->entries = $this->lines;
-        $packet->type = SetScorePacket::TYPE_REMOVE;
-        $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
-        $this->lines = [];
-    }
-
-    public function addLine(string $line, ?int $id = null): void {
-        $id = $id ?? count($this->lines);
-
-        $entry = new ScorePacketEntry;
-        $entry->type = ScorePacketEntry::TYPE_FAKE_PLAYER;
-
-        if (isset($this->lines[$id])) {
-            $pk = new SetScorePacket;
-            $pk->entries[] = $this->lines[$id];
-            $pk->type = SetScorePacket::TYPE_REMOVE;
-            $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($pk);
-            unset($this->lines[$id]);
-        }
-        $entry->scoreboardId = $id;
-        $entry->objectiveName = $this->session->getPlayer()?->getName();
-        $entry->score = $id;
-        $entry->actorUniqueId = $this->session->getPlayer()?->getId();
-        $entry->customName = $line;
-        $this->lines[$id] = $entry;
-
-        $packet = new SetScorePacket;
-        $packet->entries[] = $entry;
-        $packet->type = SetScorePacket::TYPE_CHANGE;
-        $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
-    }
-    
     public function update(): void {
         $session = $this->session;
         $player = $session->getPlayer();
-        
+
         $game = UHC::getInstance()->getGame();
 
         if ($player === null || !$player->isOnline()) {
@@ -82,7 +48,7 @@ final class ScoreboardBuilder {
         $lines = [
             '&7'
         ];
-        
+
         switch ($game->getStatus()) {
             case GameStatus::WAITING:
                 $players = array_filter(SessionFactory::getAll(), function (Session $target): bool {
@@ -102,7 +68,7 @@ final class ScoreboardBuilder {
                 $lines[] = ' &fHost: &b' . ($game->getProperties()->getHost() ?? 'None');
                 $lines[] = '&r';
                 $lines[] = ' &fScenarios:';
-                
+
                 if (count($scenarios) === 0) {
                     $lines[] = ' &4No scenarios';
                 } else {
@@ -111,7 +77,7 @@ final class ScoreboardBuilder {
                             $lines[] = ' &b ' . $scenarios[$i]->getName();
                         }
                     }
-                    
+
                     if (count($scenarios) > 3) {
                         $lines[] = '  &band ' . (count($scenarios) - 3) . ' more..';
                     }
@@ -169,16 +135,16 @@ final class ScoreboardBuilder {
                     $lines[] = ' &fTPS: &b' . $player->getServer()->getTicksPerSecond() . ' (' . $player->getServer()->getTickUsage() . ')';
                 }
                 break;
-                
+
             case GameStatus::RESTARTING:
                 $lines[] = ' &fTime elapsed: &b' . gmdate('H:i:s', $game->getGlobalTime());
                 $lines[] = ' &r&r&r';
-                
+
                 if (!$game->getProperties()->isTeam()) {
                     $players = array_filter(SessionFactory::getAll(), function (Session $player): bool {
                         return $player->isAlive() && $player->isScattered();
                     });
-                    
+
                     if (count($players) === 1) {
                         $player = array_values($players)[0];
                         $lines[] = ' &fWinner: &b' . $player->getName();
@@ -204,5 +170,39 @@ final class ScoreboardBuilder {
         foreach ($lines as $line) {
             $this->addLine(TextFormat::colorize($line));
         }
+    }
+
+    public function clear(): void {
+        $packet = new SetScorePacket;
+        $packet->entries = $this->lines;
+        $packet->type = SetScorePacket::TYPE_REMOVE;
+        $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
+        $this->lines = [];
+    }
+
+    public function addLine(string $line, ?int $id = null): void {
+        $id = $id ?? count($this->lines);
+
+        $entry = new ScorePacketEntry;
+        $entry->type = ScorePacketEntry::TYPE_FAKE_PLAYER;
+
+        if (isset($this->lines[$id])) {
+            $pk = new SetScorePacket;
+            $pk->entries[] = $this->lines[$id];
+            $pk->type = SetScorePacket::TYPE_REMOVE;
+            $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($pk);
+            unset($this->lines[$id]);
+        }
+        $entry->scoreboardId = $id;
+        $entry->objectiveName = $this->session->getPlayer()?->getName();
+        $entry->score = $id;
+        $entry->actorUniqueId = $this->session->getPlayer()?->getId();
+        $entry->customName = $line;
+        $this->lines[$id] = $entry;
+
+        $packet = new SetScorePacket;
+        $packet->entries[] = $entry;
+        $packet->type = SetScorePacket::TYPE_CHANGE;
+        $this->session->getPlayer()?->getNetworkSession()->sendDataPacket($packet);
     }
 }

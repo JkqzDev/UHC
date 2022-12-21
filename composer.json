@@ -1,0 +1,7 @@
+{
+  "require": {
+    "pocketmine/pocketmine-mp": "4.12.2",
+    "ext-curl": "*",
+    "ext-iconv": "*"
+  }
+}

@@ -17,15 +17,6 @@ final class TopKillsCommand extends Command {
         parent::__construct('topkills', 'Command for top kills', null, ['kt']);
     }
 
-    private function getPlayers(): array {
-        $players = [];
-
-        foreach (SessionFactory::getAll() as $session) {
-            $players[$session->getName()] = $session->getKills();
-        }
-        return $players;
-    }
-
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         $game = UHC::getInstance()->getGame();
 
@@ -47,5 +38,14 @@ final class TopKillsCommand extends Command {
                 $sender->sendMessage(TextFormat::colorize('&b' . $pos . '. &f' . $name[$i] . ' &7- &3' . $kill[$i] . ' kill(s)'));
             }
         }
+    }
+
+    private function getPlayers(): array {
+        $players = [];
+
+        foreach (SessionFactory::getAll() as $session) {
+            $players[$session->getName()] = $session->getKills();
+        }
+        return $players;
     }
 }

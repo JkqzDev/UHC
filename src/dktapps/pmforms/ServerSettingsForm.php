@@ -23,6 +23,8 @@ declare(strict_types=1);
 
 namespace dktapps\pmforms;
 
+use Closure;
+
 /**
  * Represents a custom form which can be shown in the Settings menu on the client. This is exactly the same as a regular
  * CustomForm, except that this type can also have an icon which can be shown on the settings section button.
@@ -30,30 +32,30 @@ namespace dktapps\pmforms;
  * Passing this form to {@link Player::sendForm()} will not show a form with an icon nor set this form as the server
  * settings.
  */
-class ServerSettingsForm extends CustomForm{
-	/** @var FormIcon|null */
-	private $icon;
+class ServerSettingsForm extends CustomForm {
+    /** @var FormIcon|null */
+    private $icon;
 
-	public function __construct(string $title, array $elements, ?FormIcon $icon, \Closure $onSubmit, ?\Closure $onClose = null){
-		parent::__construct($title, $elements, $onSubmit, $onClose);
-		$this->icon = $icon;
-	}
+    public function __construct(string $title, array $elements, ?FormIcon $icon, Closure $onSubmit, ?Closure $onClose = null) {
+        parent::__construct($title, $elements, $onSubmit, $onClose);
+        $this->icon = $icon;
+    }
 
-	public function hasIcon() : bool{
-		return $this->icon !== null;
-	}
+    public function getIcon(): ?FormIcon {
+        return $this->icon;
+    }
 
-	public function getIcon() : ?FormIcon{
-		return $this->icon;
-	}
+    protected function serializeFormData(): array {
+        $data = parent::serializeFormData();
 
-	protected function serializeFormData() : array{
-		$data = parent::serializeFormData();
+        if ($this->hasIcon()) {
+            $data["icon"] = $this->icon;
+        }
 
-		if($this->hasIcon()){
-			$data["icon"] = $this->icon;
-		}
+        return $data;
+    }
 
-		return $data;
-	}
+    public function hasIcon(): bool {
+        return $this->icon !== null;
+    }
 }

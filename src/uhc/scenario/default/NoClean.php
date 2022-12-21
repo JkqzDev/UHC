@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace uhc\scenario\default;
 
-use pocketmine\event\entity\EntityDamageByChildEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityDeathEvent;
@@ -12,7 +11,7 @@ use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\TextFormat;
-use uhc\entity\DisconnectedMob;
+use uhc\player\entity\DisconnectedMob;
 use uhc\scenario\Scenario;
 use uhc\session\SessionFactory;
 use uhc\UHC;

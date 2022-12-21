@@ -14,19 +14,6 @@ use uhc\UHC;
 
 final class ScatteringTask extends Task {
 
-    private function getQueues(): array {
-        $game = UHC::getInstance()->getGame();
-
-        if ($game->getProperties()->isTeam()) {
-            return array_filter(TeamFactory::getAll(), function (Team $team): bool {
-                return count($team->getOnlineMembers()) !== 0 && $team->isAlive() && !$team->isScattered();
-            });
-        }
-        return array_filter(SessionFactory::getAll(), function (Session $session): bool {
-            return $session->isOnline() && $session->isAlive() && !$session->isScattered();
-        });
-    }
-
     public function onRun(): void {
         $game = UHC::getInstance()->getGame();
         $queues = $this->getQueues();
@@ -40,5 +27,18 @@ final class ScatteringTask extends Task {
             $game->setStatus(GameStatus::STARTING);
             $this->getHandler()->cancel();
         }
+    }
+
+    private function getQueues(): array {
+        $game = UHC::getInstance()->getGame();
+
+        if ($game->getProperties()->isTeam()) {
+            return array_filter(TeamFactory::getAll(), function (Team $team): bool {
+                return count($team->getOnlineMembers()) !== 0 && $team->isAlive() && !$team->isScattered();
+            });
+        }
+        return array_filter(SessionFactory::getAll(), function (Session $session): bool {
+            return $session->isOnline() && $session->isAlive() && !$session->isScattered();
+        });
     }
 }

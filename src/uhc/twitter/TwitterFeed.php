@@ -22,14 +22,10 @@ final class TwitterFeed {
     static public function sendAnnounceMessage(int $waitingTime): void {
         $twitter = new Twitter(TwitterData::CONSUMER_KEY, TwitterData::CONSUMER_SECRET, TwitterData::ACCESS_TOKEN, TwitterData::ACCESS_SECRET);
         $game = UHC::getInstance()->getGame();
-        $scenarios = array_filter(ScenarioFactory::getAll(), function (Scenario $scenario): bool {
-            return $scenario->isEnabled();
-        });
+        $scenarios = array_filter(ScenarioFactory::getAll(), fn(Scenario $scenario) => $scenario->isEnabled());
 
         $gameType = !$game->getProperties()->isTeam() ? 'FFA' : 'TO' . TeamFactory::getProperties()->getMaxPlayers();
-        $scenarioList = implode(', ', array_map(function (Scenario $scenario) {
-            return $scenario->getName();
-        }, $scenarios));
+        $scenarioList = implode(', ', array_map(fn(Scenario $scenario) => $scenario->getName(), $scenarios));
         $host = $game->getProperties()->getHost() ?? 'None';
         $message = 'Cloud UHC' . PHP_EOL . PHP_EOL . 'Type: ' . $gameType . ' | ' . $scenarioList . PHP_EOL . 'Host: ' . $host . PHP_EOL . 'Starting in ' . $waitingTime . ' ' . ($waitingTime === 1 ? 'minute' : 'minutes') . PHP_EOL . PHP_EOL . 'IP: na.clouduhc.lol - 25600';
 

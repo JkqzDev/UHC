@@ -18,15 +18,14 @@ final class CatEyes extends Scenario {
         parent::__construct('Cat Eyes', 'All players receive night vision when the game begins', self::PRIORITY_LOW, true);
     }
 
-    public function addEffect(Player $player): void
-    {
-        $effects = $player->getEffects();
-        $effects->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), Limits::INT32_MAX));
-    }
-
     public function handleStart(GameStartEvent $event): void {
         foreach (Server::getInstance()->getOnlinePlayers() as $player) {
             $this->addEffect($player);
         }
+    }
+
+    public function addEffect(Player $player): void {
+        $effects = $player->getEffects();
+        $effects->add(new EffectInstance(VanillaEffects::NIGHT_VISION(), Limits::INT32_MAX));
     }
 }

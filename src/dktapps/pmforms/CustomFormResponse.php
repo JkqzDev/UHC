@@ -23,55 +23,57 @@ declare(strict_types=1);
 
 namespace dktapps\pmforms;
 
+use InvalidArgumentException;
+
 /**
  * @phpstan-type ResponseData array<string, mixed>
  */
-class CustomFormResponse{
-	/**
-	 * @var mixed[]
-	 * @phpstan-var ResponseData
-	 */
-	private $data;
+class CustomFormResponse {
+    /**
+     * @var mixed[]
+     * @phpstan-var ResponseData
+     */
+    private $data;
 
-	/**
-	 * @param mixed[] $data
-	 * @phpstan-param ResponseData $data
-	 */
-	public function __construct(array $data){
-		$this->data = $data;
-	}
+    /**
+     * @param mixed[] $data
+     * @phpstan-param ResponseData $data
+     */
+    public function __construct(array $data) {
+        $this->data = $data;
+    }
 
-	public function getInt(string $name) : int{
-		$this->checkExists($name);
-		return $this->data[$name];
-	}
+    public function getInt(string $name): int {
+        $this->checkExists($name);
+        return $this->data[$name];
+    }
 
-	public function getString(string $name) : string{
-		$this->checkExists($name);
-		return $this->data[$name];
-	}
+    private function checkExists(string $name): void {
+        if (!isset($this->data[$name])) {
+            throw new InvalidArgumentException("Value \"$name\" not found");
+        }
+    }
 
-	public function getFloat(string $name) : float{
-		$this->checkExists($name);
-		return $this->data[$name];
-	}
+    public function getString(string $name): string {
+        $this->checkExists($name);
+        return $this->data[$name];
+    }
 
-	public function getBool(string $name) : bool{
-		$this->checkExists($name);
-		return $this->data[$name];
-	}
+    public function getFloat(string $name): float {
+        $this->checkExists($name);
+        return $this->data[$name];
+    }
 
-	/**
-	 * @return mixed[]
-	 * @phpstan-return ResponseData
-	 */
-	public function getAll() : array{
-		return $this->data;
-	}
+    public function getBool(string $name): bool {
+        $this->checkExists($name);
+        return $this->data[$name];
+    }
 
-	private function checkExists(string $name) : void{
-		if(!isset($this->data[$name])){
-			throw new \InvalidArgumentException("Value \"$name\" not found");
-		}
-	}
+    /**
+     * @return mixed[]
+     * @phpstan-return ResponseData
+     */
+    public function getAll(): array {
+        return $this->data;
+    }
 }

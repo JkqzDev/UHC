@@ -9,24 +9,22 @@ use juqn\twitter\data\Token;
 use juqn\twitter\request\Request;
 use juqn\twitter\Util;
 
-class SignatureMethod_HMAC_SHA1 extends SignatureMethod {
-    
+final class SignatureMethod_HMAC_SHA1 extends SignatureMethod {
+
     public function get_name(): string {
         return 'HMAC-SHA1';
-	}
-	
-	public function build_signature(Request $request, Consumer $consumer, ?Token $token): string {
-		$base_string = $request->get_signature_base_string();
-		$request->base_string = $base_string;
+    }
 
-		$key_parts = [
-			$consumer->secret,
-			$token ? $token->secret : '',
-		];
+    public function build_signature(Request $request, Consumer $consumer, ?Token $token): string {
+        $base_string = $request->get_signature_base_string();
+        $request->base_string = $base_string;
+        $key_parts = [
+            $consumer->getSecret(),
+            $token ? $token->getSecret() : '',
+        ];
+        $key_parts = Util::urlencoded_rfc3986($key_parts);
+        $key = implode('&', $key_parts);
 
-		$key_parts = Util::urlencode_rfc3986($key_parts);
-		$key = implode('&', $key_parts);
-
-		return base64_encode(hash_hmac('sha1', $base_string, $key, true));
-	}
+        return base64_encode(hash_hmac('sha1', $base_string, $key, true));
+    }
 }

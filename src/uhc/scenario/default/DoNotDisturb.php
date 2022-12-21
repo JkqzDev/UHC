@@ -7,7 +7,7 @@ namespace uhc\scenario\default;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\player\Player;
-use uhc\entity\DisconnectedMob;
+use uhc\player\entity\DisconnectedMob;
 use uhc\scenario\Scenario;
 
 final class DoNotDisturb extends Scenario {
@@ -16,17 +16,6 @@ final class DoNotDisturb extends Scenario {
         private array $players = []
     ) {
         parent::__construct('Do Not Disturb', 'When you hit someone no one else can hit you or the player you are fighting for 15 seconds', self::PRIORITY_HIGH);
-    }
-
-    final protected function isPlayer(string $guidPlayer): bool {
-        return isset($this->players[$guidPlayer]);
-    }
-
-    final protected function addPlayer(string $guidPlayer, string $guidOpponent): void {
-        $this->players[$guidPlayer] = [
-            'opponent' => $guidOpponent,
-            'time' => time() + 15
-        ];
     }
 
     final public function removePlayer(string $guid): void {
@@ -81,5 +70,16 @@ final class DoNotDisturb extends Scenario {
             $this->addPlayer($guidPlayer, $guidOpponent);
             $this->addPlayer($guidPlayer, $guidPlayer);
         }
+    }
+
+    final protected function isPlayer(string $guidPlayer): bool {
+        return isset($this->players[$guidPlayer]);
+    }
+
+    final protected function addPlayer(string $guidPlayer, string $guidOpponent): void {
+        $this->players[$guidPlayer] = [
+            'opponent' => $guidOpponent,
+            'time' => time() + 15
+        ];
     }
 }

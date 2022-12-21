@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace uhc\entity;
+namespace uhc\player\entity;
 
 use pocketmine\entity\Zombie;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
@@ -26,6 +26,10 @@ final class DisconnectedMob extends Zombie {
         return $this->disconnected;
     }
 
+    public function setDisconnected(Disconnected $disconnected): void {
+        $this->disconnected = $disconnected;
+    }
+
     public function getRealName(): string {
         return $this->disconnected !== null ? $this->disconnected->getSession()->getName() : '';
     }
@@ -37,15 +41,15 @@ final class DisconnectedMob extends Zombie {
         return 0;
     }
 
-    public function getContents(): array {
-        return $this->disconnected !== null ? $this->disconnected->getInventory() : [];
-    }
-
     public function getDrops(): array {
         if ($this->disconnected !== null) {
             return array_merge($this->disconnected->getInventory(), $this->getArmorInventory()->getContents());
         }
         return [];
+    }
+
+    public function getContents(): array {
+        return $this->disconnected !== null ? $this->disconnected->getInventory() : [];
     }
 
     public function attack(EntityDamageEvent $source): void {
@@ -60,7 +64,7 @@ final class DisconnectedMob extends Zombie {
             if ($cause === EntityDamageEvent::CAUSE_VOID) {
                 $this->teleport($this->getWorld()->getSpawnLocation());
             }
-            
+
             if ($game->getStatus() !== GameStatus::RUNNING) {
                 $source->cancel();
                 return;
@@ -110,7 +114,7 @@ final class DisconnectedMob extends Zombie {
         if ($game->getStatus() !== GameStatus::RUNNING) {
             return;
         }
-        $message = '&c(AFK) ' . $session->getName() . ' &7[&f' . $session->getKills() . '&7] &edied'; 
+        $message = '&c(AFK) ' . $session->getName() . ' &7[&f' . $session->getKills() . '&7] &edied';
 
         if ($this->lastHit !== null) {
             /** @var Session */
@@ -124,14 +128,10 @@ final class DisconnectedMob extends Zombie {
         $game->getInventoryCache()->addInventory($session->getXuid(), $disconnected->getArmorInventory(), $disconnected->getInventory());
         $game->getPositionCache()->addPosition($session->getXuid(), $this->getPosition());
         $game->checkWinner();
-        
+
         $message = TextFormat::colorize($message);
-        
+
         Server::getInstance()->broadcastMessage($message);
         DiscordFeed::sendKillMessage(TextFormat::clean($message));
-    }
-
-    public function setDisconnected(Disconnected $disconnected): void {
-        $this->disconnected = $disconnected;
     }
 }
